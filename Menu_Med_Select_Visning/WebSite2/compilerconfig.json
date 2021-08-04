@@ -1,0 +1,10 @@
+﻿[
+  {
+    "outputFile": "CSS/StyleSheet_scss.css",
+    "inputFile": "CSS/StyleSheet_scss.scss"
+  },
+  {
+    "outputFile": "CSS/Farver_scss.css",
+    "inputFile": "CSS/Farver_scss.scss"
+  }
+]

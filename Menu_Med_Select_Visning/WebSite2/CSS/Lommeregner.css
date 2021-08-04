@@ -1,0 +1,14 @@
+﻿.calcinput {
+    float: left;
+    width: 10%;
+}
+
+.operatorspace {
+    float: left;
+    text-align: center;
+    width: 30px;
+}
+
+.resultlist {
+    all: initial;
+}

@@ -1,0 +1,71 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Page 2</title>
+    <script src="Scripts/jquery-3.0.0.min.js"></script>
+    <link href="CSS/StyleSheet.css" rel="stylesheet" />
+    <link href="CSS/Lommeregner.css" rel="stylesheet" />
+</head>
+
+<body onload="MakeTopMenuBar();">
+    <div id="TopMenuBarContent"></div>
+
+    <br />
+
+    <div id="currentOp">
+        <input class="calcinput" type="text" id="number1input" value="0" />
+        <div class="operatorspace" id="operator">
+            <!-- &nbsp; -->
+            +
+        </div>
+        <input class="calcinput" type="text" id="number2input" value="0" />
+        <div class="operatorspace">
+            =
+        </div>
+        <input class="calcinput" type="text" readonly id="resultinput" value="0" />
+    </div>
+
+    <br />
+    <br />
+
+    <input type="button" value="+" onclick="$('#operator')[0].innerText = '+'"/>
+    <input type="button" value="-" onclick="$('#operator')[0].innerText = '-'"/>
+    <input type="button" value="*" onclick="$('#operator')[0].innerText = '*'"/>
+    <input type="button" value="/" onclick="$('#operator')[0].innerText = '/'"/>
+
+    <br />
+
+    <input type="button" value="=" onclick="CalculateResult()"/>
+    <input type="button" value="CE" onclick="ClearEverything()"/>
+
+
+    <br />
+    <br />
+    <br />
+
+    <!-- Wraps cloned 'currentOp' divs, then placed in 'resultRows'. -->
+    <li id="cloneLi" hidden class="resultlist"></li>
+
+    <input type="button" id="restoreButton" value="restore" hidden onclick="restoreOp(this)" />
+
+    <ul class="resultlist" id="resultRows">
+        <!-- Previous operations will be placed here. -->
+    </ul>
+
+
+</body>
+
+</html>
+
+<script src="ScriptFiles/MenuBar.js"></script>
+<script src="ScriptFiles/Lommeregner.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        SetupDOMElements();
+    })
+</script>
+
