@@ -28,6 +28,10 @@ function restoreOp(button) {
     })
 }
 
+function deleteOp(button) {
+    button.parentNode.remove()
+}
+
 function addResultRow() {
     
     var cloneOp = $("#currentOp")[0].cloneNode(true);
@@ -44,11 +48,14 @@ function addResultRow() {
     })
 
     restoreButton = $("#restoreButton")[0].cloneNode(true);
-
     restoreButton.id = cloneOp.id + "restoreButton";
     restoreButton.hidden = false;
-
     cloneOp.appendChild(restoreButton);
+
+    deleteButton = $("#deleteButton")[0].cloneNode(true);
+    deleteButton.id = cloneOp.id + "deleteButton";
+    deleteButton.hidden = false;
+    cloneOp.appendChild(deleteButton);
 
     var liWrapper = $("#cloneLi")[0].cloneNode(true);
     liWrapper.id = "stackOp" + newID;
