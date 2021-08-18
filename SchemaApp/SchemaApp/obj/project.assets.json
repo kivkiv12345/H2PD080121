@@ -1,0 +1,90 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "SchemaClasses/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v3.1",
+        "compile": {
+          "bin/placeholder/SchemaClasses.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/SchemaClasses.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SchemaClasses/1.0.0": {
+      "type": "project",
+      "path": "../SchemaClasses/SchemaClasses.csproj",
+      "msbuildProject": "../SchemaClasses/SchemaClasses.csproj"
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETCoreApp,Version=v3.1": [
+      "SchemaClasses >= 1.0.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Kevin\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaApp\\SchemaApp.csproj",
+      "projectName": "SchemaApp",
+      "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaApp\\SchemaApp.csproj",
+      "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaApp\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "netcoreapp3.1"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "projectReferences": {
+            "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
+              "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj"
+            }
+          }
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "netcoreapp3.1": {
+        "targetAlias": "netcoreapp3.1",
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}
