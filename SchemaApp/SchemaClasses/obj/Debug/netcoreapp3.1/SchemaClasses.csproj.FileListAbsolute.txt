@@ -1,0 +1,9 @@
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\obj\Debug\netcoreapp3.1\SchemaClasses.csprojAssemblyReference.cache
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\obj\Debug\netcoreapp3.1\SchemaClasses.AssemblyInfoInputs.cache
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\obj\Debug\netcoreapp3.1\SchemaClasses.AssemblyInfo.cs
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\obj\Debug\netcoreapp3.1\SchemaClasses.csproj.CoreCompileInputs.cache
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\bin\Debug\netcoreapp3.1\SchemaClasses.deps.json
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\bin\Debug\netcoreapp3.1\SchemaClasses.dll
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\bin\Debug\netcoreapp3.1\SchemaClasses.pdb
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\obj\Debug\netcoreapp3.1\SchemaClasses.dll
+C:\Users\kevin\source\repos\H2PD080121\SchemaApp\SchemaClasses\obj\Debug\netcoreapp3.1\SchemaClasses.pdb

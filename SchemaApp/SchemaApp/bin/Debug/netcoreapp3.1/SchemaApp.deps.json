@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "SchemaApp/1.0.0": {
+        "dependencies": {
+          "SchemaClasses": "1.0.0"
+        },
+        "runtime": {
+          "SchemaApp.dll": {}
+        }
+      },
+      "SchemaClasses/1.0.0": {
+        "runtime": {
+          "SchemaClasses.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "SchemaApp/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "SchemaClasses/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
