@@ -13,32 +13,6 @@ namespace SchemaClasses
         public int Age { get; set; }
         public Sex Sex { get; set; }
 
-        /// <returns> A HashSet of the CampusTeams this person is included in. </returns>
-        public HashSet<CampusTeam> GetTeams()  // GetTeams is convenient, but probably increases coupling.
-        {
-            HashSet <CampusTeam> returnTeams = new HashSet<CampusTeam>();
-            foreach (CampusTeam team in Collections.CampusTeams)
-                if (team.Contains(this))
-                    returnTeams.Add(team);
-            return returnTeams;
-        }
-
-        public Person()
-        {
-            Collections.People.Add(this);
-        }
-        public Person(string username, string password)
-        {
-            this.UserName = username;
-            this.Password = password;
-            Collections.People.Add(this);
-        }
-
-        ~Person()
-        {
-            Collections.People.Remove(this);
-        }
-
         /// <summary>
         /// Useful when the user itself needs to be paired with matching login credentials.
         /// </summary>
@@ -50,15 +24,9 @@ namespace SchemaClasses
 
     public class Student : Person
     {
-        public Student(string username, string password) : base(username, password)
-        {
-        }
     }
 
     public class Teacher : Person
     {
-        public Teacher(string username, string password) : base(username, password)
-        {
-        }
     }
 }

@@ -32,7 +32,7 @@ namespace SchemaClasses
         {
             // Ensure that the specified teams intersect with the teams of the person.
             HashSet<CampusTeam> inSet = new HashSet<CampusTeam>(teams);
-            inSet.IntersectWith(person.GetTeams());
+            inSet.IntersectWith(GetTeams(person));
 
             foreach (CampusTeam team in inSet)
                 team.Remove(person);
@@ -42,7 +42,7 @@ namespace SchemaClasses
         /// <param name="person"> Person which should be removed from all its teams. </param>
         public static void RemoveFromTeams(Person person)
         {
-            foreach (CampusTeam team in person.GetTeams())
+            foreach (CampusTeam team in GetTeams(person))
                 team.Remove(person);
         }
 
@@ -70,6 +70,30 @@ namespace SchemaClasses
             foreach (CampusTeam team in teams)
                 team.Add(person);
         }
+        /// <summary>
+        /// Useful when the user itself needs to be paired with matching login credentials.
+        /// </summary>
+        /// <returns>A KeyValuePair which may be added 'directly' to the users dictionary.</returns>
+        public static KeyValuePair<Login, Person> Login(Person person) => new KeyValuePair<Login, Person>(new Login(person), person);
 
+        /// <returns> A HashSet of the CampusTeams the provided person is included in. </returns>
+        public static HashSet<CampusTeam> GetTeams(Person person)  // GetTeams is convenient, but probably increases coupling.
+        {
+            HashSet<CampusTeam> returnTeams = new HashSet<CampusTeam>();
+            foreach (CampusTeam team in Collections.CampusTeams)
+                if (team.Contains(person))
+                    returnTeams.Add(team);
+            return returnTeams;
+        }
+
+        public static HashSet<T> GetRelatedTeam<T>(Person person) where T : Person
+        {
+            HashSet<T> returnSet = new HashSet<T>();
+            foreach (CampusTeam team in PersonController.GetTeams(person))
+                if (team.Contains(person))
+                    foreach (T relatedPerson in team.membersOfType<T>())
+                        returnSet.Add(relatedPerson);
+            return returnSet;
+        }
     }
 }
