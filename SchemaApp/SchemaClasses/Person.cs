@@ -13,12 +13,6 @@ namespace SchemaClasses
         public int Age { get; set; }
         public Sex Sex { get; set; }
 
-        /// <summary>
-        /// Useful when the user itself needs to be paired with matching login credentials.
-        /// </summary>
-        /// <returns>A KeyValuePair which may be added 'directly' to the users dictionary.</returns>
-        public KeyValuePair<Login, Person> Login() => new KeyValuePair<Login, Person>(new Login(this), this);
-
         public override string ToString() => $"[{this.UserName}, {this.GetType().Name}]";
     }
 
