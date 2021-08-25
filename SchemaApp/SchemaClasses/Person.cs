@@ -16,11 +16,12 @@ namespace SchemaClasses
         public override string ToString() => $"[{this.UserName}, {this.GetType().Name}]";
     }
 
-    public class Student : Person
+    public sealed class Student : Person
     {
+        public int Grade { get; set; }  // TODO Kevin: Testing
     }
 
-    public class Teacher : Person
+    public sealed class Teacher : Person
     {
     }
 }

@@ -11,6 +11,15 @@ namespace SchemaClasses
         FEMALE,
     }
 
+    public enum Grades
+    {
+        _12 = 12,
+        _10 = 10,
+        _7 = 7,
+        _4 = 4,
+        _02 = 2,
+    }
+
     public interface ILogin
     {
         public string UserName { get; set; }

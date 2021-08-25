@@ -13,13 +13,17 @@ namespace SchemaApp
         public static IDictionary<Login, Person> users = new List<KeyValuePair<Login, Person>>
         {
             // Initial members are added in this list.
-            new Teacher("Egon", "IsNice").Login(),
-            new Student("Kiv", "Test1234!").Login(),
-            new Student("Dig", "qwerty").Login(),
+            PersonController.Login(PersonController.CreatePerson<Teacher>("Egon", "IsNice")),
+            PersonController.Login(PersonController.CreatePerson<Student>("Kiv", "Test1234!")),
+            PersonController.Login(PersonController.CreatePerson<Student>("Dig", "qwerty")),
         }.ToDictionary(x => x.Key, x => x.Value);
 
         static void Main(string[] args)
         {
+            // TODO Kevin: Testing stuff.
+            Student student = PersonController.CreatePerson<Student>("Kevin", "Test1234!");
+            PersonController.Save(student);
+
             while (true)
             {
 

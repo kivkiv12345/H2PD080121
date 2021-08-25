@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 
 namespace SchemaClasses
 {
     public static class PersonController
     {
-        public static T CreatePerson<T>(string firstName, string lastname, string username, string password, int age, Sex sex) where T : Person
+
+        public static T Getperson<T>(int id) where T : Person
         {
-            try
-            {
-                return (T)Activator.CreateInstance(typeof(Person), new object[] { firstName, lastname, username, password, age, sex });
-            } 
-            catch
-            {
-                T person = Activator.CreateInstance<T>();
-                person.FirstName = firstName;
-                person.LastName = lastname;
-                person.UserName = username;
-                person.Password = password;
-                person.Age = age;
-                person.Sex = sex;
-                return person;
-            }
+            throw new NotImplementedException();
+        }
+
+        public static T CreatePerson<T>(string firstName, string password) where T : Person
+        {
+            T person = Activator.CreateInstance<T>();
+            person.FirstName = firstName;
+            person.Password = password;
+            return person;
         }
 
         /// <summary> Removes the provided person from the specified teams. </summary>
@@ -86,6 +82,13 @@ namespace SchemaClasses
             return returnTeams;
         }
 
+        /// <summary>
+        /// Finds related people of the specified type.
+        /// Example: Find students for the specified teacher.
+        /// </summary>
+        /// <typeparam name="T">Type of person which should be found and returned in related classrooms.</typeparam>
+        /// <param name="person">Person for which related people should be found.</param>
+        /// <returns>Hashset of related people of the specified type.</returns>
         public static HashSet<T> GetRelatedTeam<T>(Person person) where T : Person
         {
             HashSet<T> returnSet = new HashSet<T>();
@@ -94,6 +97,18 @@ namespace SchemaClasses
                     foreach (T relatedPerson in team.membersOfType<T>())
                         returnSet.Add(relatedPerson);
             return returnSet;
+        }
+
+        public static void Save(Person person)
+        {
+            HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
+            Console.WriteLine("Stuff");
+            HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(person.GetType().GetProperties());
+            tPropSet.ExceptWith(personPropSet);
+            foreach (PropertyInfo prop in tPropSet)
+                if (personPropSet.Contains(prop))
+                    Console.WriteLine("inside");
+            Console.WriteLine("lol");
         }
     }
 }
