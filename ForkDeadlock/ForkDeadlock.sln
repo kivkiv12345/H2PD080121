@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForkDeadlock", "ForkDeadlock\ForkDeadlock.csproj", "{9502780E-D473-413B-978B-3BFF7A54235A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9502780E-D473-413B-978B-3BFF7A54235A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9502780E-D473-413B-978B-3BFF7A54235A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9502780E-D473-413B-978B-3BFF7A54235A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9502780E-D473-413B-978B-3BFF7A54235A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5BE87AAD-1E4E-43E8-8EA5-78234B09398E}
+	EndGlobalSection
+EndGlobal

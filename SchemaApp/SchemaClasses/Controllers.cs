@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using static SchemaClasses.Exceptions;
 
 namespace SchemaClasses
 {
@@ -101,6 +102,15 @@ namespace SchemaClasses
 
         public static void Save(Person person)
         {
+            try
+            {
+                person.validate();
+            } catch(ValidationError e)
+            {
+                // TODO Kevin: Perhaps handle user feedback here.
+                throw e;
+            }
+
             HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
             Console.WriteLine("Stuff");
             HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(person.GetType().GetProperties());

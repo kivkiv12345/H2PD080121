@@ -1,0 +1,13 @@
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\bin\Debug\netcoreapp3.1\ForkDeadlock.exe
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\bin\Debug\netcoreapp3.1\ForkDeadlock.deps.json
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\bin\Debug\netcoreapp3.1\ForkDeadlock.runtimeconfig.json
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\bin\Debug\netcoreapp3.1\ForkDeadlock.runtimeconfig.dev.json
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\bin\Debug\netcoreapp3.1\ForkDeadlock.dll
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\bin\Debug\netcoreapp3.1\ForkDeadlock.pdb
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.csprojAssemblyReference.cache
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.AssemblyInfoInputs.cache
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.AssemblyInfo.cs
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.csproj.CoreCompileInputs.cache
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.dll
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.pdb
+C:\Users\Kevin\source\repos\H2PD080121\ForkDeadlock\ForkDeadlock\obj\Debug\netcoreapp3.1\ForkDeadlock.genruntimeconfig.cache

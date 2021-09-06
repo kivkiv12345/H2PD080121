@@ -18,8 +18,20 @@ namespace SchemaApp
             PersonController.Login(PersonController.CreatePerson<Student>("Dig", "qwerty")),
         }.ToDictionary(x => x.Key, x => x.Value);
 
+        
+
+        public delegate bool Validator(Person person);
+
+        public static Validator validate;
+
         static void Main(string[] args)
         {
+            Person person = PersonController.CreatePerson<Student>("Kiv", "Test1234!");
+
+            validate(person);
+
+            Environment.Exit(0);
+
             // TODO Kevin: Testing stuff.
             Student student = PersonController.CreatePerson<Student>("Kevin", "Test1234!");
             PersonController.Save(student);

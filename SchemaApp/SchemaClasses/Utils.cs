@@ -18,6 +18,8 @@ namespace SchemaClasses
         _7 = 7,
         _4 = 4,
         _02 = 2,
+        _00 = 0,
+        _03 = -3,
     }
 
     public interface ILogin
