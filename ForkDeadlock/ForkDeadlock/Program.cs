@@ -33,14 +33,29 @@ namespace ForkDeadlock
             foreach (Thread thread in threads)
                 thread.Start();
 
+            static void ClearCurrentConsoleLine()
+            {
+                int currentLineCursor = Console.CursorTop;
+                Console.SetCursorPosition(0, Console.CursorTop);
+                Console.Write(new string(' ', Console.WindowWidth));
+                Console.SetCursorPosition(0, currentLineCursor);
+            }
+
             while (true)
             {
-                foreach (Dude dude in dudes)
+                for (int i = 0; i < dudes.Length; i++)
                 {
-                    Console.WriteLine($"{dude.name}\t is {(!dude.isEating ? "not" : "")} eating");
+                    Console.SetCursorPosition(0, i);
+                    ClearCurrentConsoleLine();
+                    Console.WriteLine($"{dudes[i].name}\t is {(dudes[i].isEating ? "" : "not")} eating");
                 }
+
+                /*foreach (Dude dude in dudes)
+                {
+                    Console.WriteLine($"{dude.name}\t is {(dude.isEating ? "" : "not")} eating");
+                }*/
                 Thread.Sleep(200);
-                Console.Clear();
+                //Console.Clear();
             }
 
             foreach (Thread thread in threads)
