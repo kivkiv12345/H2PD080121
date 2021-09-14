@@ -15,7 +15,8 @@ namespace SchemaClasses
 
         private void _ValidateName()
         {
-            if (this.FirstName == string.Empty || this.LastName == string.Empty)
+            HashSet<object> _invalid_types = new HashSet<object>{ null, "", string.Empty};
+            if (_invalid_types.Contains(this.FirstName) || _invalid_types.Contains(this.LastName))
                 throw new ValidationError("Cannot save person without a name.");
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using static SchemaClasses.Exceptions;
@@ -100,24 +101,31 @@ namespace SchemaClasses
             return returnSet;
         }
 
-        public static void Save(Person person)
+        public static void Save(Person person, bool validate = true)
         {
-            try
+            if (validate)
             {
-                person.validate();
-            } catch(ValidationError e)
-            {
-                // TODO Kevin: Perhaps handle user feedback here.
-                throw e;
+                try
+                {
+                    person.validate();
+                }
+                catch (ValidationError e)
+                {
+                    // TODO Kevin: Perhaps handle user feedback here.
+                    throw e;
+                }
             }
 
+            // Get the properties of the Person class.
             HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
-            Console.WriteLine("Stuff");
-            HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(person.GetType().GetProperties());
-            tPropSet.ExceptWith(personPropSet);
-            foreach (PropertyInfo prop in tPropSet)
-                if (personPropSet.Contains(prop))
-                    Console.WriteLine("inside");
+
+            // Get the names of the properties of the Person class.
+            HashSet<string> personPropSetNames = new HashSet<string>(from prop in typeof(Person).GetProperties() select prop.Name);
+
+            // Get all the properties of the subclass, which aren't defined by Person.
+            HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
+                from prop in person.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);
+
             Console.WriteLine("lol");
         }
     }
