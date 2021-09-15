@@ -13,7 +13,7 @@ namespace SchemaClasses
 
         public static HashSet<Person> People = new HashSet<Person>();
 
-        public static HashSet<T> PersonOfType<T>()
+        public static HashSet<T> PeopleOfType<T>()
         {
             HashSet<T> returnMembers = new HashSet<T>();
             foreach (Person person in People)
