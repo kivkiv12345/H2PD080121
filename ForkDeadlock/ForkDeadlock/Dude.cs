@@ -12,26 +12,14 @@ namespace ForkDeadlock
 
         public bool isEating { get; set; }
         public string name { get; set; }
+        private bool isPolite { get; set; }
 
-        public Dude(Fork leftFork, Fork rightFork, string name)
+        public Dude(Fork leftFork, Fork rightFork, string name, bool isPolite = false)
         {
             this.leftFork = leftFork;
             this.rightFork = rightFork;
             this.name = name;
-        }
-
-        /// <summary>
-        /// Waits until fork becomes available, then takes it.
-        /// </summary>
-        private void aquireFork(Fork fork)
-        {
-            lock (fork)
-            {
-                // TODO Kevin: This 'while' probably doesn't make sense, when the fork is locked.
-                while (fork.inUseBy != this)
-                    if (fork.inUseBy == null)
-                        fork.inUseBy = this;
-            }
+            this.isPolite = isPolite;
         }
 
         /// <summary>
@@ -57,17 +45,6 @@ namespace ForkDeadlock
             {
                 Thread.Sleep(new Random().Next(250, 500));
 
-                //this.aquireFork(this.leftFork);
-                //this.aquireFork(this.rightFork);
-
-                //if (!(this.tryGetFork(this.leftFork) && this.tryGetFork(this.rightFork)))
-                //{
-                //    //Console.WriteLine($"{this.name} cant eat");
-                //    this.leftFork.inUseBy = null;  // The left fork may have been grabbed when we get here, so we release it.
-                //    continue;
-                //}
-                    
-
                 if (!this.tryGetFork(this.leftFork))
                 {
                     //Console.WriteLine($"{this.name} cant get first fork");
@@ -76,7 +53,7 @@ namespace ForkDeadlock
                     
                 if (!this.tryGetFork(this.rightFork))
                 {
-                    this.leftFork.inUseBy = null;
+                    if (this.isPolite) this.leftFork.inUseBy = null;
                     //Console.WriteLine($"{this.name} couldn't get second fork");
                     continue;
                 }
@@ -90,6 +67,8 @@ namespace ForkDeadlock
                 rightFork.inUseBy = null;
 
                 this.isEating = false;
+
+                Thread.Sleep(new Random().Next(250, 500));
 
             }
         }

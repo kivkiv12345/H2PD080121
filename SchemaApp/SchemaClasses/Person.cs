@@ -6,6 +6,7 @@ namespace SchemaClasses
 {
     public abstract class Person : ILogin
     {
+        public ulong? personID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string UserName { get; set; }
@@ -15,7 +16,7 @@ namespace SchemaClasses
 
         private void _ValidateName()
         {
-            HashSet<object> _invalid_types = new HashSet<object>{ null, "", string.Empty};
+            HashSet<object> _invalid_types = new HashSet<object> { null, "", string.Empty};
             if (_invalid_types.Contains(this.FirstName) || _invalid_types.Contains(this.LastName))
                 throw new ValidationError("Cannot save person without a name.");
         }

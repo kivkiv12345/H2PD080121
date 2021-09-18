@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -122,11 +123,49 @@ namespace SchemaClasses
             // Get the names of the properties of the Person class.
             HashSet<string> personPropSetNames = new HashSet<string>(from prop in typeof(Person).GetProperties() select prop.Name);
 
+            // TODO Kevin:
+
             // Get all the properties of the subclass, which aren't defined by Person.
             HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
                 from prop in person.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);
 
-            Console.WriteLine("lol");
+            using (MySqlConnection conn = new MySqlConnection(DatabaseManager.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+
+                    // Saving a new person, uses INSERT 
+                    if (person.personID == null)
+                    {
+                        string sql = "INSERT INTO Person() VALUES (); SELECT max() FROM Person";
+                        MySqlCommand cmd = new MySqlCommand(sql, conn);
+                        MySqlDataReader rdr = cmd.ExecuteReader();
+
+                        while (rdr.Read())
+                        {
+                            Console.WriteLine(rdr[0] + " -- " + rdr[1]);
+                        }
+                        rdr.Close();
+
+                        person.personID = 3;//personIDFromDatabase;
+                    }
+                    else  // Saving an existing person, uses UPDATE
+                    {
+
+                    }
+
+                    
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
         }
     }
 }

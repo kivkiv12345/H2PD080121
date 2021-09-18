@@ -16,16 +16,25 @@ namespace ForkDeadlock
                 new Fork(),
             };
 
+            Fork nextFork(ref int fork)
+            {
+                fork = (fork + 1) % forks.Length;
+                return forks[fork];
+            }
+
+            int leftFork = 4;
+            int rightFork = 0;
+
             Dude[] dudes =
             {
-                new Dude(forks[4], forks[0], "Gustav"),
-                new Dude(forks[0], forks[1], "Kevin"),
-                new Dude(forks[1], forks[2], "Rasmus"),
-                new Dude(forks[2], forks[3], "Niels"),
-                new Dude(forks[3], forks[4], "Frank"),
+                new Dude(nextFork(ref leftFork), nextFork(ref rightFork), "Gustav"),
+                new Dude(nextFork(ref leftFork), nextFork(ref rightFork), "Kevin"),
+                new Dude(nextFork(ref leftFork), nextFork(ref rightFork), "Rasmus"),
+                new Dude(nextFork(ref leftFork), nextFork(ref rightFork), "Niels"),
+                new Dude(nextFork(ref leftFork), nextFork(ref rightFork), "Frank"),
             };
 
-            Thread[] threads = new Thread[5];
+            Thread[] threads = new Thread[dudes.Length];
 
             for (int i = 0; i < dudes.Length; i++)
                 threads[i] = new Thread(new ThreadStart(dudes[i].Eat));
@@ -33,7 +42,7 @@ namespace ForkDeadlock
             foreach (Thread thread in threads)
                 thread.Start();
 
-            static void ClearCurrentConsoleLine()
+            static void ClearCurrentConsoleLine()  // Stolen from StackOverflow; somewhere...
             {
                 int currentLineCursor = Console.CursorTop;
                 Console.SetCursorPosition(0, Console.CursorTop);

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {}
+    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
+    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
+        "projectUniqueName": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
         "projectName": "SchemaClasses",
-        "projectPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
-        "packagesPath": "C:\\Users\\kevin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\obj\\",
+        "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
+        "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -39,6 +39,12 @@
       "frameworks": {
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.0.26, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -54,7 +60,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }
