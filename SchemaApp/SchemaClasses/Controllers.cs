@@ -16,11 +16,11 @@ namespace SchemaClasses
             throw new NotImplementedException();
         }
 
-        public static T CreatePerson<T>(string firstName, string password) where T : Person
+        public static T CreatePerson<T>(string firstName, string lastName) where T : Person
         {
             T person = Activator.CreateInstance<T>();
             person.FirstName = firstName;
-            person.Password = password;
+            person.LastName = lastName;
             return person;
         }
 
@@ -69,11 +69,6 @@ namespace SchemaClasses
             foreach (CampusTeam team in teams)
                 team.Add(person);
         }
-        /// <summary>
-        /// Useful when the user itself needs to be paired with matching login credentials.
-        /// </summary>
-        /// <returns>A KeyValuePair which may be added 'directly' to the users dictionary.</returns>
-        public static KeyValuePair<Login, Person> Login(Person person) => new KeyValuePair<Login, Person>(new Login(person), person);
 
         /// <returns> A HashSet of the CampusTeams the provided person is included in. </returns>
         public static HashSet<CampusTeam> GetTeams(Person person)  // GetTeams is convenient, but probably increases coupling.
@@ -101,6 +96,17 @@ namespace SchemaClasses
                         returnSet.Add(relatedPerson);
             return returnSet;
         }
+
+        private delegate string saveStringConverter(object input);
+
+        /// <summary>
+        /// This dictionary contains delegates which convert datatypes to formats acceptable when saving.
+        /// </summary>
+        private static Dictionary<Type, saveStringConverter> saveconversions = new Dictionary<Type, saveStringConverter>() {
+            { typeof(DateTime), new saveStringConverter(delegate (object _date) {
+                return ((DateTime)_date).ToString("yyyy-mm-dd");
+            })},
+        };
 
         public static void Save(Person person, bool validate = true)
         {
@@ -138,7 +144,16 @@ namespace SchemaClasses
                     // Saving a new person, uses INSERT 
                     if (person.personID == null)
                     {
-                        string sql = "INSERT INTO Person() VALUES (); SELECT max() FROM Person";
+                        // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
+                        var personPropNameArray = from propName in personPropSetNames where person.GetType().GetProperty(propName).GetValue(person, null) != null select propName;  // TODO Kevin: This slice may be dependant on hashset order, and might therefore break.
+                        var personPropValueArray = from propName in personPropNameArray select person.GetType().GetProperty(propName).GetValue(person, null);
+
+                        var tPropNameArray = from prop in tPropSet where person.GetType().GetProperty(prop.Name).GetValue(person, null) != null select prop.Name;
+                        var tPropValueArray = from propName in tPropNameArray select person.GetType().GetProperty(propName).GetValue(person, null);
+
+                        //string[] personPropValueArray = (from propName in personPropNameArray select person.GetType().GetProperty(propName).GetValue(person, null).ToString()).ToArray();
+
+                        string sql = $"INSERT INTO Person({string.Join(", ", personPropNameArray)}) VALUES (\"{string.Join("\", \"", personPropValueArray)}\"); SELECT max() FROM Person;";
                         MySqlCommand cmd = new MySqlCommand(sql, conn);
                         MySqlDataReader rdr = cmd.ExecuteReader();
 
@@ -148,7 +163,7 @@ namespace SchemaClasses
                         }
                         rdr.Close();
 
-                        person.personID = 3;//personIDFromDatabase;
+                        person.personID = 3;  // TODO Kevin: personIDFromDatabase;
                     }
                     else  // Saving an existing person, uses UPDATE
                     {

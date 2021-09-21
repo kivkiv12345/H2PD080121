@@ -1,13 +1,16 @@
--- MySQL dump 10.13  Distrib 8.0.26, for Linux (x86_64)
+-- Dump completed on 2021-09-21  5:50:08
+CREATE DATABASE  IF NOT EXISTS `schema_h2` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `schema_h2`;
+-- MySQL dump 10.13  Distrib 8.0.26, for Win64 (x86_64)
 --
--- Host: localhost    Database: schema_H2
+-- Host: localhost    Database: schema_h2
 -- ------------------------------------------------------
--- Server version	8.0.26-0ubuntu0.20.04.2
+-- Server version	8.0.26
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!50503 SET NAMES utf8mb4 */;
+/*!50503 SET NAMES utf8 */;
 /*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
 /*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
@@ -16,17 +19,13 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `ContactInformation`
+-- Table structure for table `contactinformation`
 --
 
-CREATE DATABASE IF NOT EXISTS schema_H2;
-
-USE schema_H2;
-
-DROP TABLE IF EXISTS `ContactInformation`;
+DROP TABLE IF EXISTS `contactinformation`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `ContactInformation` (
+CREATE TABLE `contactinformation` (
   `cprNumber` bigint unsigned NOT NULL,
   `phoneNumber` int DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
@@ -35,52 +34,52 @@ CREATE TABLE `ContactInformation` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ContactInformation`
+-- Dumping data for table `contactinformation`
 --
 
-LOCK TABLES `ContactInformation` WRITE;
-/*!40000 ALTER TABLE `ContactInformation` DISABLE KEYS */;
-INSERT INTO `ContactInformation` VALUES (1234567890,NULL,NULL),(3328142926,NULL,NULL),(5772618857,NULL,NULL),(6180741191,NULL,NULL),(7322858337,NULL,NULL),(7629863185,NULL,NULL),(8178317211,NULL,NULL);
-/*!40000 ALTER TABLE `ContactInformation` ENABLE KEYS */;
+LOCK TABLES `contactinformation` WRITE;
+/*!40000 ALTER TABLE `contactinformation` DISABLE KEYS */;
+INSERT INTO `contactinformation` VALUES (1234567890,NULL,NULL),(3328142926,NULL,NULL),(5772618857,NULL,NULL),(6180741191,NULL,NULL),(7322858337,NULL,NULL),(7629863185,NULL,NULL),(8178317211,NULL,NULL);
+/*!40000 ALTER TABLE `contactinformation` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Grade`
+-- Table structure for table `grade`
 --
 
-DROP TABLE IF EXISTS `Grade`;
+DROP TABLE IF EXISTS `grade`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Grade` (
+CREATE TABLE `grade` (
   `student` bigint unsigned NOT NULL,
   `subject` bigint unsigned NOT NULL,
   `date` date NOT NULL,
   `grade` enum('12','10','7','4','2','02') DEFAULT NULL,
   PRIMARY KEY (`student`,`subject`),
   KEY `fk_Grade_1_idx` (`subject`),
-  CONSTRAINT `fk_Grade_1` FOREIGN KEY (`subject`) REFERENCES `Subject` (`subjectid`),
-  CONSTRAINT `fk_Grade_2` FOREIGN KEY (`student`) REFERENCES `Student` (`person`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fk_Grade_1` FOREIGN KEY (`subject`) REFERENCES `subject` (`subjectid`),
+  CONSTRAINT `fk_Grade_2` FOREIGN KEY (`student`) REFERENCES `student` (`person`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Grade`
+-- Dumping data for table `grade`
 --
 
-LOCK TABLES `Grade` WRITE;
-/*!40000 ALTER TABLE `Grade` DISABLE KEYS */;
-INSERT INTO `Grade` VALUES (7,3,'2021-08-27','12'),(8,3,'2021-08-27','10');
-/*!40000 ALTER TABLE `Grade` ENABLE KEYS */;
+LOCK TABLES `grade` WRITE;
+/*!40000 ALTER TABLE `grade` DISABLE KEYS */;
+INSERT INTO `grade` VALUES (7,3,'2021-08-27','12'),(8,3,'2021-08-27','10');
+/*!40000 ALTER TABLE `grade` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `LogCreatePerson`
+-- Table structure for table `logcreateperson`
 --
 
-DROP TABLE IF EXISTS `LogCreatePerson`;
+DROP TABLE IF EXISTS `logcreateperson`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `LogCreatePerson` (
+CREATE TABLE `logcreateperson` (
   `LogCreateId` bigint unsigned NOT NULL AUTO_INCREMENT,
   `message` varchar(75) NOT NULL,
   PRIMARY KEY (`LogCreateId`),
@@ -89,91 +88,94 @@ CREATE TABLE `LogCreatePerson` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `LogCreatePerson`
+-- Dumping data for table `logcreateperson`
 --
 
-LOCK TABLES `LogCreatePerson` WRITE;
-/*!40000 ALTER TABLE `LogCreatePerson` DISABLE KEYS */;
-INSERT INTO `LogCreatePerson` VALUES (1,'4 Egon 2021-08-27 11:46:53'),(2,'5 Kaj 2021-08-27 11:50:26'),(3,'6 Gabe 2021-08-27 11:50:46'),(4,'7 William 2021-08-27 11:50:58'),(5,'8 Jens 2021-08-27 11:51:13'),(6,'9 Karl 2021-08-27 11:54:01'),(7,'10 Dudebro 2021-08-27 12:02:46');
-/*!40000 ALTER TABLE `LogCreatePerson` ENABLE KEYS */;
+LOCK TABLES `logcreateperson` WRITE;
+/*!40000 ALTER TABLE `logcreateperson` DISABLE KEYS */;
+INSERT INTO `logcreateperson` VALUES (1,'4 Egon 2021-08-27 11:46:53'),(2,'5 Kaj 2021-08-27 11:50:26'),(3,'6 Gabe 2021-08-27 11:50:46'),(4,'7 William 2021-08-27 11:50:58'),(5,'8 Jens 2021-08-27 11:51:13'),(6,'9 Karl 2021-08-27 11:54:01'),(7,'10 Dudebro 2021-08-27 12:02:46');
+/*!40000 ALTER TABLE `logcreateperson` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Parent`
+-- Table structure for table `parent`
 --
 
-DROP TABLE IF EXISTS `Parent`;
+DROP TABLE IF EXISTS `parent`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Parent` (
+CREATE TABLE `parent` (
   `person` bigint unsigned NOT NULL,
   PRIMARY KEY (`person`),
   UNIQUE KEY `person` (`person`),
-  CONSTRAINT `fk_Parent_1` FOREIGN KEY (`person`) REFERENCES `Person` (`personId`)
+  CONSTRAINT `fk_Parent_1` FOREIGN KEY (`person`) REFERENCES `person` (`personId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Parent`
+-- Dumping data for table `parent`
 --
 
-LOCK TABLES `Parent` WRITE;
-/*!40000 ALTER TABLE `Parent` DISABLE KEYS */;
-INSERT INTO `Parent` VALUES (4),(5);
-/*!40000 ALTER TABLE `Parent` ENABLE KEYS */;
+LOCK TABLES `parent` WRITE;
+/*!40000 ALTER TABLE `parent` DISABLE KEYS */;
+INSERT INTO `parent` VALUES (4),(5);
+/*!40000 ALTER TABLE `parent` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Parent_X_Student`
+-- Table structure for table `parent_x_student`
 --
 
-DROP TABLE IF EXISTS `Parent_X_Student`;
+DROP TABLE IF EXISTS `parent_x_student`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Parent_X_Student` (
+CREATE TABLE `parent_x_student` (
   `parent` bigint unsigned NOT NULL,
   `student` bigint unsigned NOT NULL,
   PRIMARY KEY (`parent`,`student`),
   KEY `Parent_X_Student_FK` (`student`),
-  CONSTRAINT `Parent_X_Student_FK` FOREIGN KEY (`student`) REFERENCES `Student` (`person`),
-  CONSTRAINT `Parent_X_Student_FK_1` FOREIGN KEY (`parent`) REFERENCES `Parent` (`person`)
+  CONSTRAINT `Parent_X_Student_FK` FOREIGN KEY (`student`) REFERENCES `student` (`person`),
+  CONSTRAINT `Parent_X_Student_FK_1` FOREIGN KEY (`parent`) REFERENCES `parent` (`person`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Parent_X_Student`
+-- Dumping data for table `parent_x_student`
 --
 
-LOCK TABLES `Parent_X_Student` WRITE;
-/*!40000 ALTER TABLE `Parent_X_Student` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Parent_X_Student` ENABLE KEYS */;
+LOCK TABLES `parent_x_student` WRITE;
+/*!40000 ALTER TABLE `parent_x_student` DISABLE KEYS */;
+/*!40000 ALTER TABLE `parent_x_student` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Person`
+-- Table structure for table `person`
 --
 
-DROP TABLE IF EXISTS `Person`;
+DROP TABLE IF EXISTS `person`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Person` (
+CREATE TABLE `person` (
   `personId` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
+  `FirstName` varchar(100) NOT NULL,
+  `LastName` varchar(100) NOT NULL,
   `contactInformation` bigint unsigned DEFAULT NULL,
+  `Birthday` date DEFAULT NULL,
+  `Sex` enum('MALE','FEMALE') NOT NULL,
   PRIMARY KEY (`personId`),
   KEY `fk_Person_1_idx` (`contactInformation`),
-  CONSTRAINT `fk_Person_1` FOREIGN KEY (`contactInformation`) REFERENCES `ContactInformation` (`cprNumber`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `fk_Person_1` FOREIGN KEY (`contactInformation`) REFERENCES `contactinformation` (`cprNumber`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Person`
+-- Dumping data for table `person`
 --
 
-LOCK TABLES `Person` WRITE;
-/*!40000 ALTER TABLE `Person` DISABLE KEYS */;
-INSERT INTO `Person` VALUES (4,'Egon',1234567890),(5,'Kaj',8178317211),(6,'Gabe',5772618857),(7,'William',3328142926),(8,'Jens',7322858337),(9,'Karl',7629863185),(10,'Dudebro',6180741191);
-/*!40000 ALTER TABLE `Person` ENABLE KEYS */;
+LOCK TABLES `person` WRITE;
+/*!40000 ALTER TABLE `person` DISABLE KEYS */;
+INSERT INTO `person` VALUES (4,'Egon','0',1234567890,NULL,'MALE'),(5,'Kaj','0',8178317211,NULL,'MALE'),(6,'Gabe','0',5772618857,NULL,'MALE'),(7,'William','0',3328142926,NULL,'MALE'),(8,'Jens','0',7322858337,NULL,'MALE'),(9,'Karl','0',7629863185,NULL,'MALE'),(10,'Dudebro','0',6180741191,NULL,'MALE');
+/*!40000 ALTER TABLE `person` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -184,7 +186,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `triggerPersonLog` AFTER INSERT ON `Person` FOR EACH ROW INSERT INTO LogCreatePerson(message) VALUES (CONCAT(NEW.personId, " ", NEW.name, " ", NOW())) */;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `triggerPersonLog` AFTER INSERT ON `person` FOR EACH ROW INSERT INTO LogCreatePerson(message) VALUES (CONCAT(NEW.personId, " ", NEW.FirstName, " ", NOW())) */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
@@ -192,69 +194,70 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
--- Table structure for table `Person_X_Team`
+-- Table structure for table `person_x_team`
 --
 
-DROP TABLE IF EXISTS `Person_X_Team`;
+DROP TABLE IF EXISTS `person_x_team`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Person_X_Team` (
+CREATE TABLE `person_x_team` (
   `person` bigint unsigned NOT NULL,
   `team` varchar(25) NOT NULL,
   PRIMARY KEY (`person`,`team`),
   KEY `fk_Person_X_Team_2` (`team`),
-  CONSTRAINT `fk_Person_X_Team_1` FOREIGN KEY (`person`) REFERENCES `Person` (`personId`),
-  CONSTRAINT `fk_Person_X_Team_2` FOREIGN KEY (`team`) REFERENCES `Team` (`teamName`)
+  CONSTRAINT `fk_Person_X_Team_1` FOREIGN KEY (`person`) REFERENCES `person` (`personId`),
+  CONSTRAINT `fk_Person_X_Team_2` FOREIGN KEY (`team`) REFERENCES `team` (`teamName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Person_X_Team`
+-- Dumping data for table `person_x_team`
 --
 
-LOCK TABLES `Person_X_Team` WRITE;
-/*!40000 ALTER TABLE `Person_X_Team` DISABLE KEYS */;
-/*!40000 ALTER TABLE `Person_X_Team` ENABLE KEYS */;
+LOCK TABLES `person_x_team` WRITE;
+/*!40000 ALTER TABLE `person_x_team` DISABLE KEYS */;
+/*!40000 ALTER TABLE `person_x_team` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Student`
+-- Table structure for table `student`
 --
 
-DROP TABLE IF EXISTS `Student`;
+DROP TABLE IF EXISTS `student`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Student` (
+CREATE TABLE `student` (
   `person` bigint unsigned NOT NULL,
   `team` varchar(25) NOT NULL,
   PRIMARY KEY (`person`),
   UNIQUE KEY `person` (`person`),
   KEY `Student_FK_1` (`team`),
-  CONSTRAINT `fk_Student_1` FOREIGN KEY (`person`) REFERENCES `Person` (`personId`),
-  CONSTRAINT `Student_FK_1` FOREIGN KEY (`team`) REFERENCES `Team` (`teamName`)
+  CONSTRAINT `fk_Student_1` FOREIGN KEY (`person`) REFERENCES `person` (`personId`),
+  CONSTRAINT `Student_FK_1` FOREIGN KEY (`team`) REFERENCES `team` (`teamName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Student`
+-- Dumping data for table `student`
 --
 
-LOCK TABLES `Student` WRITE;
-/*!40000 ALTER TABLE `Student` DISABLE KEYS */;
-INSERT INTO `Student` VALUES (7,'H1111111'),(8,'H2222222');
-/*!40000 ALTER TABLE `Student` ENABLE KEYS */;
+LOCK TABLES `student` WRITE;
+/*!40000 ALTER TABLE `student` DISABLE KEYS */;
+INSERT INTO `student` VALUES (7,'H1111111'),(8,'H2222222');
+/*!40000 ALTER TABLE `student` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Temporary view structure for view `StudentsOfClasses`
+-- Temporary view structure for view `studentsofclasses`
 --
 
-DROP TABLE IF EXISTS `StudentsOfClasses`;
-/*!50001 DROP VIEW IF EXISTS `StudentsOfClasses`*/;
+DROP TABLE IF EXISTS `studentsofclasses`;
+/*!50001 DROP VIEW IF EXISTS `studentsofclasses`*/;
 SET @saved_cs_client     = @@character_set_client;
 /*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `StudentsOfClasses` AS SELECT 
- 1 AS `name`,
+/*!50001 CREATE VIEW `studentsofclasses` AS SELECT 
+ 1 AS `FirstName`,
+ 1 AS `LastName`,
  1 AS `team`,
  1 AS `phoneNumber`,
  1 AS `email`,
@@ -262,13 +265,13 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
--- Table structure for table `Subject`
+-- Table structure for table `subject`
 --
 
-DROP TABLE IF EXISTS `Subject`;
+DROP TABLE IF EXISTS `subject`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Subject` (
+CREATE TABLE `subject` (
   `subjectid` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`subjectid`),
@@ -278,23 +281,23 @@ CREATE TABLE `Subject` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Subject`
+-- Dumping data for table `subject`
 --
 
-LOCK TABLES `Subject` WRITE;
-/*!40000 ALTER TABLE `Subject` DISABLE KEYS */;
-INSERT INTO `Subject` VALUES (3,'Database Programming'),(1,'English'),(2,'Seriousness');
-/*!40000 ALTER TABLE `Subject` ENABLE KEYS */;
+LOCK TABLES `subject` WRITE;
+/*!40000 ALTER TABLE `subject` DISABLE KEYS */;
+INSERT INTO `subject` VALUES (3,'Database Programming'),(1,'English'),(2,'Seriousness');
+/*!40000 ALTER TABLE `subject` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `SubjectModule`
+-- Table structure for table `subjectmodule`
 --
 
-DROP TABLE IF EXISTS `SubjectModule`;
+DROP TABLE IF EXISTS `subjectmodule`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `SubjectModule` (
+CREATE TABLE `subjectmodule` (
   `team` varchar(25) NOT NULL,
   `startTime` datetime NOT NULL,
   `endDate` datetime NOT NULL,
@@ -304,81 +307,81 @@ CREATE TABLE `SubjectModule` (
   UNIQUE KEY `team_UNIQUE` (`team`),
   KEY `fk_SubjectModule_1_idx` (`teacher`),
   KEY `fk_SubjectModule_3_idx` (`subject`),
-  CONSTRAINT `fk_SubjectModule_1` FOREIGN KEY (`teacher`) REFERENCES `Teacher` (`person`),
-  CONSTRAINT `fk_SubjectModule_2` FOREIGN KEY (`team`) REFERENCES `Team` (`teamName`),
-  CONSTRAINT `fk_SubjectModule_3` FOREIGN KEY (`subject`) REFERENCES `Subject` (`subjectid`)
+  CONSTRAINT `fk_SubjectModule_1` FOREIGN KEY (`teacher`) REFERENCES `teacher` (`person`),
+  CONSTRAINT `fk_SubjectModule_2` FOREIGN KEY (`team`) REFERENCES `team` (`teamName`),
+  CONSTRAINT `fk_SubjectModule_3` FOREIGN KEY (`subject`) REFERENCES `subject` (`subjectid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `SubjectModule`
+-- Dumping data for table `subjectmodule`
 --
 
-LOCK TABLES `SubjectModule` WRITE;
-/*!40000 ALTER TABLE `SubjectModule` DISABLE KEYS */;
-/*!40000 ALTER TABLE `SubjectModule` ENABLE KEYS */;
+LOCK TABLES `subjectmodule` WRITE;
+/*!40000 ALTER TABLE `subjectmodule` DISABLE KEYS */;
+/*!40000 ALTER TABLE `subjectmodule` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `SubjectTeacher`
+-- Table structure for table `subjectteacher`
 --
 
-DROP TABLE IF EXISTS `SubjectTeacher`;
+DROP TABLE IF EXISTS `subjectteacher`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `SubjectTeacher` (
+CREATE TABLE `subjectteacher` (
   `teacher` bigint unsigned NOT NULL,
   `subject` bigint unsigned NOT NULL,
   PRIMARY KEY (`teacher`,`subject`),
   KEY `fk_SubjectTeacher_2_idx` (`subject`),
-  CONSTRAINT `fk_SubjectTeacher_1` FOREIGN KEY (`teacher`) REFERENCES `Teacher` (`person`),
-  CONSTRAINT `fk_SubjectTeacher_2` FOREIGN KEY (`subject`) REFERENCES `Subject` (`subjectid`)
+  CONSTRAINT `fk_SubjectTeacher_1` FOREIGN KEY (`teacher`) REFERENCES `teacher` (`person`),
+  CONSTRAINT `fk_SubjectTeacher_2` FOREIGN KEY (`subject`) REFERENCES `subject` (`subjectid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `SubjectTeacher`
+-- Dumping data for table `subjectteacher`
 --
 
-LOCK TABLES `SubjectTeacher` WRITE;
-/*!40000 ALTER TABLE `SubjectTeacher` DISABLE KEYS */;
-INSERT INTO `SubjectTeacher` VALUES (5,1),(6,3);
-/*!40000 ALTER TABLE `SubjectTeacher` ENABLE KEYS */;
+LOCK TABLES `subjectteacher` WRITE;
+/*!40000 ALTER TABLE `subjectteacher` DISABLE KEYS */;
+INSERT INTO `subjectteacher` VALUES (5,1),(6,3);
+/*!40000 ALTER TABLE `subjectteacher` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Teacher`
+-- Table structure for table `teacher`
 --
 
-DROP TABLE IF EXISTS `Teacher`;
+DROP TABLE IF EXISTS `teacher`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Teacher` (
+CREATE TABLE `teacher` (
   `person` bigint unsigned NOT NULL,
   PRIMARY KEY (`person`),
   UNIQUE KEY `person` (`person`),
-  CONSTRAINT `fk_Teacher_1` FOREIGN KEY (`person`) REFERENCES `Person` (`personId`)
+  CONSTRAINT `fk_Teacher_1` FOREIGN KEY (`person`) REFERENCES `person` (`personId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Teacher`
+-- Dumping data for table `teacher`
 --
 
-LOCK TABLES `Teacher` WRITE;
-/*!40000 ALTER TABLE `Teacher` DISABLE KEYS */;
-INSERT INTO `Teacher` VALUES (5),(6);
-/*!40000 ALTER TABLE `Teacher` ENABLE KEYS */;
+LOCK TABLES `teacher` WRITE;
+/*!40000 ALTER TABLE `teacher` DISABLE KEYS */;
+INSERT INTO `teacher` VALUES (5),(6);
+/*!40000 ALTER TABLE `teacher` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `Team`
+-- Table structure for table `team`
 --
 
-DROP TABLE IF EXISTS `Team`;
+DROP TABLE IF EXISTS `team`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `Team` (
+CREATE TABLE `team` (
   `teamName` varchar(25) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   PRIMARY KEY (`teamName`),
   UNIQUE KEY `teamName_UNIQUE` (`teamName`)
@@ -386,20 +389,28 @@ CREATE TABLE `Team` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `Team`
+-- Dumping data for table `team`
 --
 
-LOCK TABLES `Team` WRITE;
-/*!40000 ALTER TABLE `Team` DISABLE KEYS */;
-INSERT INTO `Team` VALUES ('H1111111'),('H2222222'),('H3333333'),('H4444444');
-/*!40000 ALTER TABLE `Team` ENABLE KEYS */;
+LOCK TABLES `team` WRITE;
+/*!40000 ALTER TABLE `team` DISABLE KEYS */;
+INSERT INTO `team` VALUES ('H1111111'),('H2222222'),('H3333333'),('H4444444');
+/*!40000 ALTER TABLE `team` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Final view structure for view `StudentsOfClasses`
+-- Dumping events for database 'schema_h2'
 --
 
-/*!50001 DROP VIEW IF EXISTS `StudentsOfClasses`*/;
+--
+-- Dumping routines for database 'schema_h2'
+--
+
+--
+-- Final view structure for view `studentsofclasses`
+--
+
+/*!50001 DROP VIEW IF EXISTS `studentsofclasses`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
@@ -408,7 +419,7 @@ UNLOCK TABLES;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `StudentsOfClasses` AS select `Person`.`name` AS `name`,`Student`.`team` AS `team`,`ContactInformation`.`phoneNumber` AS `phoneNumber`,`ContactInformation`.`email` AS `email`,`ContactInformation`.`cprNumber` AS `cprNumber` from ((`Student` left join `Person` on((`Student`.`person` = `Person`.`personId`))) left join `ContactInformation` on((`Person`.`contactInformation` = `ContactInformation`.`cprNumber`))) */;
+/*!50001 VIEW `studentsofclasses` AS select `person`.`FirstName` AS `FirstName`,`person`.`LastName` AS `LastName`,`student`.`team` AS `team`,`contactinformation`.`phoneNumber` AS `phoneNumber`,`contactinformation`.`email` AS `email`,`contactinformation`.`cprNumber` AS `cprNumber` from ((`student` left join `person` on((`student`.`person` = `person`.`personId`))) left join `contactinformation` on((`person`.`contactInformation` = `contactinformation`.`cprNumber`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -422,4 +433,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-09-15 10:48:45
+-- Dump completed on 2021-09-21  5:50:08

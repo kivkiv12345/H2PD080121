@@ -4,15 +4,13 @@ using static SchemaClasses.Exceptions;
 
 namespace SchemaClasses
 {
-    public abstract class Person : ILogin
+    public abstract class Person
     {
         public ulong? personID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public int Age { get; set; }
-        public Sex Sex { get; set; }
+        public DateTime? Birthday { get; set; }
+        public Sex? Sex { get; set; }
 
         private void _ValidateName()
         {
@@ -21,7 +19,7 @@ namespace SchemaClasses
                 throw new ValidationError("Cannot save person without a name.");
         }
 
-        public override string ToString() => $"[{this.UserName}, {this.GetType().Name}]";
+        public override string ToString() => $"[{this.FirstName}, {this.GetType().Name}]";
 
         public Validator validate;
 
@@ -38,7 +36,7 @@ namespace SchemaClasses
 
     public sealed class Student : Person
     {
-        public int Grade { get; set; }  // TODO Kevin: Testing
+        public Grades Grade { get; set; }  // TODO Kevin: Testing
 
         public void _ValidateStudent()
         {
