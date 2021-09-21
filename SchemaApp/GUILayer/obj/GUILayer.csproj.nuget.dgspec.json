@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {}
+    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {
+    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
+        "projectUniqueName": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
         "projectName": "GUILayer",
-        "projectPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
-        "packagesPath": "C:\\Users\\kevin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\obj\\",
+        "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
+        "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -27,7 +27,11 @@
         "frameworks": {
           "net5.0-windows7.0": {
             "targetAlias": "net5.0-windows",
-            "projectReferences": {}
+            "projectReferences": {
+              "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
+                "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj"
+              }
+            }
           }
         },
         "warningProperties": {
@@ -57,7 +61,67 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
+        "projectName": "SchemaClasses",
+        "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
+        "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.0.26, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
         }
       }
     }

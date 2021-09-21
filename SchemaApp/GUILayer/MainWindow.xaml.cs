@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SchemaClasses;
 
 namespace GUILayer
 {
@@ -23,16 +25,35 @@ namespace GUILayer
         public MainWindow()
         {
             InitializeComponent();
+
+            createEditForm<Student>();
+            createEditForm<Teacher>();
         }
 
-        private void lol_button_click(object sender, RoutedEventArgs e)
+        public void createEditForm<T>() where T : class
         {
-            testMessage.Text += (!testMessage.Text.StartsWith("L") ? "LOL" : "") + "OL";
-        }
+            Type tclass = typeof(T);
 
-        private void clear_button_click(object sender, RoutedEventArgs e)
-        {
-            testMessage.Text = "";
+            ContentArea contentArea = new ContentArea();
+
+            foreach (PropertyInfo prop in tclass.GetProperties())
+            {
+                Label propLabel = new Label();
+                propLabel.Content = prop.Name;
+
+                contentArea.formWidgetPanel.Children.Add(propLabel);
+            }
+
+            void changeContentView(object sender, RoutedEventArgs e)
+            {
+                this.ContentView.Content = contentArea;
+            }
+
+            Button stackButton = new Button();
+            stackButton.Click += changeContentView;
+            stackButton.Content = tclass.Name;
+
+            this.editorButtonStack.Children.Add(stackButton);
         }
     }
 }

@@ -102,9 +102,12 @@ namespace SchemaClasses
         /// <summary>
         /// This dictionary contains delegates which convert datatypes to formats acceptable when saving.
         /// </summary>
-        private static Dictionary<Type, saveStringConverter> saveconversions = new Dictionary<Type, saveStringConverter>() {
+        private static Dictionary<Type, saveStringConverter> saveConversions = new Dictionary<Type, saveStringConverter>() {
             { typeof(DateTime), new saveStringConverter(delegate (object _date) {
                 return ((DateTime)_date).ToString("yyyy-mm-dd");
+            })},
+            { typeof(Grades), new saveStringConverter(delegate (object _grade) {
+                return ((Grades)_grade).ToString()[1..];
             })},
         };
 
@@ -135,6 +138,21 @@ namespace SchemaClasses
             HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
                 from prop in person.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);
 
+            string _convertSaveString(PropertyInfo prop)
+            {
+                var value = prop.GetValue(person, null);
+                try
+                {
+                    return saveConversions[prop.PropertyType](value);
+                }
+                catch (KeyNotFoundException)
+                {
+                    return (value ?? "null").ToString();
+                }
+            }
+
+            Type personType = person.GetType();
+
             using (MySqlConnection conn = new MySqlConnection(DatabaseManager.ConnectionString))
             {
                 try
@@ -145,25 +163,23 @@ namespace SchemaClasses
                     if (person.personID == null)
                     {
                         // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
-                        var personPropNameArray = from propName in personPropSetNames where person.GetType().GetProperty(propName).GetValue(person, null) != null select propName;  // TODO Kevin: This slice may be dependant on hashset order, and might therefore break.
-                        var personPropValueArray = from propName in personPropNameArray select person.GetType().GetProperty(propName).GetValue(person, null);
+                        var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(person, null) != null select propName;
+                        var personPropValueArray = from propName in personPropNameArray select _convertSaveString(personType.GetProperty(propName));
 
-                        var tPropNameArray = from prop in tPropSet where person.GetType().GetProperty(prop.Name).GetValue(person, null) != null select prop.Name;
-                        var tPropValueArray = from propName in tPropNameArray select person.GetType().GetProperty(propName).GetValue(person, null);
+                        var tPropNameArray = from prop in tPropSet where personType.GetProperty(prop.Name).GetValue(person, null) != null select prop.Name;
+                        var tPropValueArray = from propName in tPropNameArray select _convertSaveString(personType.GetProperty(propName));
 
-                        //string[] personPropValueArray = (from propName in personPropNameArray select person.GetType().GetProperty(propName).GetValue(person, null).ToString()).ToArray();
+                        string sql = $"START TRANSACTION; USE schema_h2;\nINSERT INTO Person({string.Join(", ", personPropNameArray)}) VALUES (\"{string.Join("\", \"", personPropValueArray)}\");\nSELECT max(personID) FROM Person;\nCOMMIT;";
+                        MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
 
-                        string sql = $"INSERT INTO Person({string.Join(", ", personPropNameArray)}) VALUES (\"{string.Join("\", \"", personPropValueArray)}\"); SELECT max() FROM Person;";
-                        MySqlCommand cmd = new MySqlCommand(sql, conn);
-                        MySqlDataReader rdr = cmd.ExecuteReader();
-
-                        while (rdr.Read())
-                        {
-                            Console.WriteLine(rdr[0] + " -- " + rdr[1]);
-                        }
+                        // Update the personID of the now saved person.
+                        rdr.Read();
+                        person.personID = Convert.ToUInt64(rdr[0]);
                         rdr.Close();
 
-                        person.personID = 3;  // TODO Kevin: personIDFromDatabase;
+                        // TODO Kevin: SQL is broken when no other properties are present.
+                        sql = $"INSERT INTO {person.GetType().Name}(person, {string.Join(", ", tPropNameArray)}) VALUES ({person.personID}, \"{string.Join("\", \"", tPropValueArray)}\");";
+                        new MySqlCommand(sql, conn).ExecuteReader();
                     }
                     else  // Saving an existing person, uses UPDATE
                     {
@@ -174,6 +190,7 @@ namespace SchemaClasses
                 }
                 catch (Exception ex)
                 {
+                    new MySqlCommand("rollback;", conn).ExecuteReader();
                     Console.WriteLine(ex.ToString());
                 }
                 finally

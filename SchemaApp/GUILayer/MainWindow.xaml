@@ -6,10 +6,14 @@
         xmlns:local="clr-namespace:GUILayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <TextBlock x:Name="testMessage" HorizontalAlignment="Left" Margin="50,86,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="98" Width="307" FontSize="15"><Run Language="da-dk" Text="LOL"/></TextBlock>
-        <Button x:Name="testButton" Content="CLICK HERE" HorizontalAlignment="Left" Margin="50,46,0,0" VerticalAlignment="Top" Height="35" Width="87" Click="lol_button_click"/>
-        <Button x:Name="button" Content="Clear" HorizontalAlignment="Left" Margin="164,46,0,0" VerticalAlignment="Top" Height="35" Width="78" Click="clear_button_click"/>
-
-    </Grid>
+    <StackPanel>
+        <StackPanel x:Name="editorButtonStack" HorizontalAlignment="Left" MaxWidth="100">
+            
+        </StackPanel>
+        
+        <UserControl Name="ContentView">
+            
+        </UserControl>
+    </StackPanel>
+    
 </Window>

@@ -36,7 +36,7 @@ namespace SchemaClasses
 
     public sealed class Student : Person
     {
-        public Grades Grade { get; set; }  // TODO Kevin: Testing
+        //public Grades Grade { get; set; }  // TODO Kevin: Testing
 
         public void _ValidateStudent()
         {

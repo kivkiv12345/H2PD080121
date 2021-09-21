@@ -20,3 +20,16 @@ C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windo
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ref\GUILayer.dll
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.pdb
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.genruntimeconfig.cache
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ContentArea.g.cs
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\BouncyCastle.Crypto.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\Google.Protobuf.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\K4os.Compression.LZ4.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\K4os.Compression.LZ4.Streams.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\K4os.Hash.xxHash.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\MySql.Data.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\Ubiety.Dns.Core.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\Zstandard.Net.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\SchemaClasses.dll
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\SchemaClasses.pdb
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ContentArea.baml
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.csproj.CopyComplete
