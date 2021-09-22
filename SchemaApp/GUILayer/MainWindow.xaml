@@ -6,14 +6,14 @@
         xmlns:local="clr-namespace:GUILayer"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <StackPanel>
-        <StackPanel x:Name="editorButtonStack" HorizontalAlignment="Left" MaxWidth="100">
+    <DockPanel>
+        <StackPanel x:Name="editorButtonStack" HorizontalAlignment="Left" MinWidth="100" DockPanel.Dock="Left">
             
         </StackPanel>
-        
-        <UserControl Name="ContentView">
+
+        <local:ContentArea x:Name="ContentView" DockPanel.Dock="Right">
             
-        </UserControl>
-    </StackPanel>
+        </local:ContentArea>
+    </DockPanel>
     
 </Window>

@@ -34,14 +34,34 @@ namespace GUILayer
         {
             Type tclass = typeof(T);
 
-            ContentArea contentArea = new ContentArea();
+            StackPanel contentArea = new StackPanel();
 
-            foreach (PropertyInfo prop in tclass.GetProperties())
+            PropertyInfo[] tclassProps = tclass.GetProperties();
+
+            int longest = 0;
+
+            foreach (PropertyInfo prop in tclassProps)
+                if (prop.Name.Length > longest)
+                    longest = prop.Name.Length;
+
+            foreach (PropertyInfo prop in tclassProps)
             {
-                Label propLabel = new Label();
-                propLabel.Content = prop.Name;
+                StackPanel horizontalPanel = new StackPanel();
+                horizontalPanel.Orientation = Orientation.Horizontal;
 
-                contentArea.formWidgetPanel.Children.Add(propLabel);
+                TextBox propLabel = new TextBox();
+                propLabel.IsReadOnly = true;
+                propLabel.Text = prop.Name;
+                propLabel.MinWidth = longest * 8;
+
+                TextBox propInput = new TextBox();
+                propInput.Width = 100;
+
+                horizontalPanel.Children.Add(propLabel);
+                horizontalPanel.Children.Add(propInput);
+
+                contentArea.Children.Add(horizontalPanel);
+
             }
 
             void changeContentView(object sender, RoutedEventArgs e)

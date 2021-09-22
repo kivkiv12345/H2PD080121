@@ -33,3 +33,4 @@ C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windo
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\SchemaClasses.pdb
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ContentArea.baml
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.csproj.CopyComplete
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GeneratedInternalTypeHelper.g.cs
