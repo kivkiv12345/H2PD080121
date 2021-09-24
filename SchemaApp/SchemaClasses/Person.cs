@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using static SchemaClasses.Exceptions;
 
 namespace SchemaClasses
 {
-    public abstract class Person
+    public abstract class Person : DBModel
     {
         public ulong? personID { get; set; }
         public string FirstName { get; set; }
@@ -20,10 +19,6 @@ namespace SchemaClasses
         }
 
         public override string ToString() => $"[{this.FirstName}, {this.GetType().Name}]";
-
-        public Validator validate;
-
-        public delegate void Validator();
 
         public Person()
         {

@@ -4,11 +4,156 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using static SchemaClasses.Exceptions;
 
 namespace SchemaClasses
 {
-    public static class PersonController
+    public abstract class DBController
+    {
+        private delegate string saveStringConverter(object input);
+
+        /// <summary>
+        /// This dictionary contains delegates which convert datatypes to formats acceptable when saving.
+        /// </summary>
+        private static Dictionary<Type, saveStringConverter> saveConversions = new Dictionary<Type, saveStringConverter>() {
+            { typeof(DateTime), new saveStringConverter(delegate (object _date) {
+                return ((DateTime)_date).ToString("yyyy-mm-dd");
+            })},
+            { typeof(Grades), new saveStringConverter(delegate (object _grade) {
+                return ((Grades)_grade).ToString()[1..];
+            })},
+        };
+
+        public static void Save(DBModel instance, bool validate = true)
+        {
+            if (validate)
+            {
+                try
+                {
+                    instance.validate();
+                }
+                catch (ValidationError e)
+                {
+                    // TODO Kevin: Perhaps handle user feedback here.
+                    throw e;
+                }
+            }
+
+            // TODO Kevin: We must recursively walk upwards in the class hierarchy to get and save the attributes of each class individually.
+
+            // Get the properties of the Person class.
+            HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
+
+            // Get the names of the properties of the Person class.
+            HashSet<string> personPropSetNames = new HashSet<string>(from prop in typeof(Person).GetProperties() select prop.Name);
+
+            // TODO Kevin:
+
+            // Get all the properties of the subclass, which aren't defined by Person.
+            HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
+                from prop in instance.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);
+
+            string _convertSaveString(PropertyInfo prop)
+            {
+                var value = prop.GetValue(instance, null);
+                try
+                {
+                    return saveConversions[prop.PropertyType](value);
+                }
+                catch (KeyNotFoundException)
+                {
+                    return (value ?? "null").ToString();
+                }
+            }
+
+            /// <summary>
+            /// Saves a specific class to a specific table. Handles subclasses.
+            /// </summary>
+            /// <param name="currTupe">A subclass of DBModel, of which properties should be saved.</param>
+            /// <returns>The properties that were saved.</returns>
+            HashSet<string> saveCurrentTable(Type currType)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
+            {
+                // TODO Kevin: Find a way to handle primary keys.
+
+                if (currType != null)
+                {
+                    // These are the fields that have already been handled. We need them to know which current fields to exclude.
+                    HashSet<string> savedFields = saveCurrentTable(currType.BaseType);
+
+                    // These are the field names, followed by their values, that should be saved at this recursion level.
+                    IEnumerable<string> orderedFieldsNamesToSave = from field in currType.GetProperties() where !savedFields.Contains(field.Name) select field.Name;
+                    IEnumerable<string> orderedFieldValuesToSave = from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName));
+
+                    // The current model doesn't define any unsaved fields, so we don't save anything for it.
+                    // TODO Kevin: This may not be the case for certain intermediate models where primary keys still need to be handled.
+                    if (orderedFieldsNamesToSave.Count() == 0)
+                        return savedFields;
+
+                    // TODO Kevin: SQL is broken when no other properties are present.
+                    string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");";
+                    new MySqlCommand(sql, conn).ExecuteNonQuery();
+
+                    foreach (string fieldName in orderedFieldsNamesToSave)
+                        savedFields.Add(fieldName);
+
+                    return savedFields;
+                }
+                // We just attempted to save a nonexistent base class (most likely because we just walked to the top the inheritance hierarchy),
+                // hence no fields were saved. We therefore return an empty hashset, indicating to the previous recursion level,
+                // that all its found fields should be saved under its model.
+                return new HashSet<string>();
+            }
+
+            Type personType = instance.GetType();
+
+            using (MySqlConnection conn = new MySqlConnection(DatabaseManager.ConnectionString))
+            {
+                try
+                {
+                    conn.Open();
+
+                    // Saving a new person, uses INSERT 
+                    if (instance.personID == null)
+                    {
+                        // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
+                        var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(instance, null) != null select propName;
+                        var personPropValueArray = from propName in personPropNameArray select _convertSaveString(personType.GetProperty(propName));
+
+                        var tPropNameArray = from prop in tPropSet where personType.GetProperty(prop.Name).GetValue(instance, null) != null select prop.Name;
+                        var tPropValueArray = from propName in tPropNameArray select _convertSaveString(personType.GetProperty(propName));
+
+                        string sql = $"START TRANSACTION; USE schema_h2;\nINSERT INTO Person({string.Join(", ", personPropNameArray)}) VALUES (\"{string.Join("\", \"", personPropValueArray)}\");\nSELECT max(personID) FROM Person;\nCOMMIT;";
+                        MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
+
+                        // Update the personID of the now saved person.
+                        rdr.Read();
+                        instance.personID = Convert.ToUInt64(rdr[0]);
+                        rdr.Close();
+
+                        // TODO Kevin: SQL is broken when no other properties are present.
+                        sql = $"INSERT INTO {instance.GetType().Name}(person, {string.Join(", ", tPropNameArray)}) VALUES ({instance.personID}, \"{string.Join("\", \"", tPropValueArray)}\");";
+                        new MySqlCommand(sql, conn).ExecuteReader();
+                    }
+                    else  // Saving an existing person, uses UPDATE
+                    {
+
+                    }
+
+
+                }
+                catch (Exception ex)
+                {
+                    new MySqlCommand("rollback;", conn).ExecuteReader();
+                    Console.WriteLine(ex.ToString());
+                }
+                finally
+                {
+                    conn.Close();
+                }
+            }
+        }
+    }
+
+    public abstract class PersonController : DBController
     {
 
         public static T Getperson<T>(int id) where T : Person
@@ -97,107 +242,6 @@ namespace SchemaClasses
             return returnSet;
         }
 
-        private delegate string saveStringConverter(object input);
-
-        /// <summary>
-        /// This dictionary contains delegates which convert datatypes to formats acceptable when saving.
-        /// </summary>
-        private static Dictionary<Type, saveStringConverter> saveConversions = new Dictionary<Type, saveStringConverter>() {
-            { typeof(DateTime), new saveStringConverter(delegate (object _date) {
-                return ((DateTime)_date).ToString("yyyy-mm-dd");
-            })},
-            { typeof(Grades), new saveStringConverter(delegate (object _grade) {
-                return ((Grades)_grade).ToString()[1..];
-            })},
-        };
-
-        public static void Save(Person person, bool validate = true)
-        {
-            if (validate)
-            {
-                try
-                {
-                    person.validate();
-                }
-                catch (ValidationError e)
-                {
-                    // TODO Kevin: Perhaps handle user feedback here.
-                    throw e;
-                }
-            }
-
-            // Get the properties of the Person class.
-            HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
-
-            // Get the names of the properties of the Person class.
-            HashSet<string> personPropSetNames = new HashSet<string>(from prop in typeof(Person).GetProperties() select prop.Name);
-
-            // TODO Kevin:
-
-            // Get all the properties of the subclass, which aren't defined by Person.
-            HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
-                from prop in person.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);
-
-            string _convertSaveString(PropertyInfo prop)
-            {
-                var value = prop.GetValue(person, null);
-                try
-                {
-                    return saveConversions[prop.PropertyType](value);
-                }
-                catch (KeyNotFoundException)
-                {
-                    return (value ?? "null").ToString();
-                }
-            }
-
-            Type personType = person.GetType();
-
-            using (MySqlConnection conn = new MySqlConnection(DatabaseManager.ConnectionString))
-            {
-                try
-                {
-                    conn.Open();
-
-                    // Saving a new person, uses INSERT 
-                    if (person.personID == null)
-                    {
-                        // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
-                        var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(person, null) != null select propName;
-                        var personPropValueArray = from propName in personPropNameArray select _convertSaveString(personType.GetProperty(propName));
-
-                        var tPropNameArray = from prop in tPropSet where personType.GetProperty(prop.Name).GetValue(person, null) != null select prop.Name;
-                        var tPropValueArray = from propName in tPropNameArray select _convertSaveString(personType.GetProperty(propName));
-
-                        string sql = $"START TRANSACTION; USE schema_h2;\nINSERT INTO Person({string.Join(", ", personPropNameArray)}) VALUES (\"{string.Join("\", \"", personPropValueArray)}\");\nSELECT max(personID) FROM Person;\nCOMMIT;";
-                        MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
-
-                        // Update the personID of the now saved person.
-                        rdr.Read();
-                        person.personID = Convert.ToUInt64(rdr[0]);
-                        rdr.Close();
-
-                        // TODO Kevin: SQL is broken when no other properties are present.
-                        sql = $"INSERT INTO {person.GetType().Name}(person, {string.Join(", ", tPropNameArray)}) VALUES ({person.personID}, \"{string.Join("\", \"", tPropValueArray)}\");";
-                        new MySqlCommand(sql, conn).ExecuteReader();
-                    }
-                    else  // Saving an existing person, uses UPDATE
-                    {
-
-                    }
-
-                    
-                }
-                catch (Exception ex)
-                {
-                    new MySqlCommand("rollback;", conn).ExecuteReader();
-                    Console.WriteLine(ex.ToString());
-                }
-                finally
-                {
-                    conn.Close();
-                }
-            }
-        }
+        
     }
 }
