@@ -23,6 +23,11 @@ namespace SchemaClasses
             })},
         };
 
+        private static IEnumerable<(string, object)> getPrimaryKeys(DBModel instance)
+        {
+            return from field in instance.GetType().GetProperties() where field.Name.ToLower().EndsWith("id") select (field.Name, field.GetValue(instance, null));
+        }
+
         public static void Save(DBModel instance, bool validate = true)
         {
             if (validate)
@@ -70,37 +75,38 @@ namespace SchemaClasses
             /// </summary>
             /// <param name="currTupe">A subclass of DBModel, of which properties should be saved.</param>
             /// <returns>The properties that were saved.</returns>
-            HashSet<string> saveCurrentTable(Type currType)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
+            (string?, HashSet<string>) saveCurrentTable(Type currType, MySqlConnection conn)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
             {
+                // TODO Kevin: We might not want the connection to be passed as a parameter.
                 // TODO Kevin: Find a way to handle primary keys.
 
-                if (currType != null)
-                {
-                    // These are the fields that have already been handled. We need them to know which current fields to exclude.
-                    HashSet<string> savedFields = saveCurrentTable(currType.BaseType);
-
-                    // These are the field names, followed by their values, that should be saved at this recursion level.
-                    IEnumerable<string> orderedFieldsNamesToSave = from field in currType.GetProperties() where !savedFields.Contains(field.Name) select field.Name;
-                    IEnumerable<string> orderedFieldValuesToSave = from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName));
-
-                    // The current model doesn't define any unsaved fields, so we don't save anything for it.
-                    // TODO Kevin: This may not be the case for certain intermediate models where primary keys still need to be handled.
-                    if (orderedFieldsNamesToSave.Count() == 0)
-                        return savedFields;
-
-                    // TODO Kevin: SQL is broken when no other properties are present.
-                    string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");";
-                    new MySqlCommand(sql, conn).ExecuteNonQuery();
-
-                    foreach (string fieldName in orderedFieldsNamesToSave)
-                        savedFields.Add(fieldName);
-
-                    return savedFields;
-                }
                 // We just attempted to save a nonexistent base class (most likely because we just walked to the top the inheritance hierarchy),
-                // hence no fields were saved. We therefore return an empty hashset, indicating to the previous recursion level,
+                // hence no fields were saved. We therefore create and return an empty hashset, indicating to the previous recursion level,
                 // that all its found fields should be saved under its model.
-                return new HashSet<string>();
+                if (currType == null)
+                    return (null, new HashSet<string>());
+
+                // These are the fields that have already been handled. We need them to know which current fields to exclude.
+                (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, conn);
+
+                // These are the field names, followed by their values, that should be saved at this recursion level.
+                IEnumerable<string> orderedFieldsNamesToSave = from field in currType.GetProperties() where !savedFields.Contains(field.Name) select field.Name;
+                IEnumerable<string> orderedFieldValuesToSave = from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName));
+
+                // The current model doesn't define any unsaved fields, so we don't save anything for it.
+                // TODO Kevin: This may not be the case for certain intermediate models where primary keys still need to be handled.
+                if (orderedFieldsNamesToSave.Count() == 0)
+                    return (PKValue, savedFields);
+
+                // TODO Kevin use somehow: currType.BaseType.Name
+
+                string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");";
+                new MySqlCommand(sql, conn).ExecuteNonQuery();
+
+                foreach (string fieldName in orderedFieldsNamesToSave)
+                    savedFields.Add(fieldName);
+
+                return (PKValue, savedFields);
             }
 
             Type personType = instance.GetType();
@@ -112,7 +118,7 @@ namespace SchemaClasses
                     conn.Open();
 
                     // Saving a new person, uses INSERT 
-                    if (instance.personID == null)
+                    if ((from tuple in getPrimaryKeys(instance) where tuple.Item2 != null select tuple).Count() != 0)
                     {
                         // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
                         var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(instance, null) != null select propName;

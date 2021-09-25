@@ -28,18 +28,18 @@ namespace SchemaClasses
     /// Used in situations where C# denies or lacks obvious functionality and or features.
     /// In such situations, this exception may be thrown following sanity checks during runtime.
     /// </summary>
-    public class CShartIsStupidException : Exception
+    public class CSharpIsStupidException : Exception
     {
-        public CShartIsStupidException()
+        public CSharpIsStupidException()
         {
         }
 
-        public CShartIsStupidException(string message)
+        public CSharpIsStupidException(string message)
             : base(message)
         {
         }
 
-        public CShartIsStupidException(string message, Exception inner)
+        public CSharpIsStupidException(string message, Exception inner)
             : base(message, inner)
         {
         }
