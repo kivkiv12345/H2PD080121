@@ -4,7 +4,6 @@ using System.Text;
 
 namespace SchemaClasses
 {
-
     public enum Sex
     {
         MALE,

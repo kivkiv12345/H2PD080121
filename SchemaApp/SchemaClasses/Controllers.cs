@@ -28,6 +28,12 @@ namespace SchemaClasses
             return from field in instance.GetType().GetProperties() where field.Name.ToLower().EndsWith("id") select (field.Name, field.GetValue(instance, null));
         }
 
+        private enum SaveModes
+        {
+            INSERT,
+            UPDATE,
+        }
+
         public static void Save(DBModel instance, bool validate = true)
         {
             if (validate)
@@ -47,20 +53,6 @@ namespace SchemaClasses
                 }
             }
 
-            // TODO Kevin: We must recursively walk upwards in the class hierarchy to get and save the attributes of each class individually.
-
-            /*// Get the properties of the Person class.
-            HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
-
-            // Get the names of the properties of the Person class.
-            HashSet<string> personPropSetNames = new HashSet<string>(from prop in typeof(Person).GetProperties() select prop.Name);
-
-            // TODO Kevin:
-
-            // Get all the properties of the subclass, which aren't defined by Person.
-            HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
-                from prop in instance.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);*/
-
             string _convertSaveString(PropertyInfo prop)
             {
                 var value = prop.GetValue(instance, null);
@@ -74,15 +66,16 @@ namespace SchemaClasses
                 }
             }
 
+            Type instanceType = instance.GetType();
+
             /// <summary>
             /// Saves a specific class to a specific table. Handles subclasses.
             /// </summary>
             /// <param name="currTupe">A subclass of DBModel, of which properties should be saved.</param>
             /// <returns>The properties that were saved.</returns>
-            (string?, HashSet<string>) saveCurrentTable(Type currType, MySqlConnection conn)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
+            (string?, HashSet<string>) saveCurrentTable(Type currType, SaveModes mode, MySqlConnection conn)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
             {
                 // TODO Kevin: We might not want the connection to be passed as a parameter.
-                // TODO Kevin: Find a way to handle primary keys.
 
                 // We just attempted to save a nonexistent base class (most likely because we just walked to the top the inheritance hierarchy),
                 // hence no fields were saved. We therefore create and return an empty hashset, indicating to the previous recursion level,
@@ -91,7 +84,7 @@ namespace SchemaClasses
                     return (null, new HashSet<string>());
 
                 // These are the fields that have already been handled. We need them to know which current fields to exclude.
-                (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, conn);
+                (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, mode, conn);
 
                 // These are the field names, followed by their values, that should be saved at this recursion level.
                 List<string> orderedFieldsNamesToSave = (from field in currType.GetProperties() where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
@@ -126,13 +119,32 @@ namespace SchemaClasses
                     PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
                 }
 
-                string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");\nSELECT max({PKColumn}) FROM {currType.Name};";
-                MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
+                if (mode == SaveModes.INSERT)
+                {
+                    string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");\nSELECT max({PKColumn}) FROM {currType.Name};";
+                    MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
 
-                // Update the personID of the now saved person.
-                rdr.Read();
-                PKValue = rdr[0].ToString();
-                rdr.Close();
+                    // Update the personID of the now saved person.
+                    rdr.Read();
+                    PKValue = rdr[0].ToString();
+                    try
+                    {
+                        currType.GetProperty(PKColumn).SetValue(instance, rdr[0]);
+                    }
+                    catch
+                    {
+                    }
+                    rdr.Close();
+                } else if (mode == SaveModes.UPDATE)
+                {
+                    IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
+                    string sql = $"UPDATE {currType.Name} SET {string.Join(", ", fieldAndValue)} WHERE {PKColumn} = {currType.GetProperty(PKColumn).GetValue(instance, null)};";
+                    new MySqlCommand(sql, conn).ExecuteNonQuery();
+                } else
+                {
+                    throw new Exception("Unsupported save mode");
+                }
+                
 
                 foreach (string fieldName in orderedFieldsNamesToSave)
                     savedFields.Add(fieldName);
@@ -140,47 +152,33 @@ namespace SchemaClasses
                 return (PKValue, savedFields);
             }
 
-            Type personType = instance.GetType();
-
             using (MySqlConnection conn = new MySqlConnection(DatabaseManager.ConnectionString))
             {
                 try
                 {
                     conn.Open();
 
+                    new MySqlCommand("START TRANSACTION;", conn).ExecuteNonQuery();
+
+                    SaveModes mode;
                     // Saving a new person, uses INSERT 
                     if ((from tuple in getPrimaryKeys(instance) where tuple.Item2 == null select tuple).Count() != 0)
                     {
-                        saveCurrentTable(instance.GetType(), conn);
-                        // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
-                        /*var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(instance, null) != null select propName;
-                        var personPropValueArray = from propName in personPropNameArray select _convertSaveString(personType.GetProperty(propName));
-
-                        var tPropNameArray = from prop in tPropSet where personType.GetProperty(prop.Name).GetValue(instance, null) != null select prop.Name;
-                        var tPropValueArray = from propName in tPropNameArray select _convertSaveString(personType.GetProperty(propName));
-
-                        string sql = $"START TRANSACTION; USE schema_h2;\nINSERT INTO Person({string.Join(", ", personPropNameArray)}) VALUES (\"{string.Join("\", \"", personPropValueArray)}\");\nSELECT max(personID) FROM Person;\nCOMMIT;";
-                        MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
-
-                        // Update the personID of the now saved person.
-                        rdr.Read();
-                        instance.personID = Convert.ToUInt64(rdr[0]);
-                        rdr.Close();
-
-                        // TODO Kevin: SQL is broken when no other properties are present.
-                        sql = $"INSERT INTO {instance.GetType().Name}(person, {string.Join(", ", tPropNameArray)}) VALUES ({instance.personID}, \"{string.Join("\", \"", tPropValueArray)}\");";
-                        new MySqlCommand(sql, conn).ExecuteReader();*/
+                        mode = SaveModes.INSERT;
                     }
                     else  // Saving an existing person, uses UPDATE
                     {
-                        throw new NotImplementedException("Cannot update DBModels yet");
+                        mode = SaveModes.UPDATE;
                     }
 
+                    saveCurrentTable(instance.GetType(), mode, conn);
+
+                    new MySqlCommand("COMMIT;", conn).ExecuteNonQuery();
 
                 }
                 catch (Exception ex)
                 {
-                    new MySqlCommand("rollback;", conn).ExecuteReader();
+                    new MySqlCommand("ROLLBACK;", conn).ExecuteNonQuery();
                     Console.WriteLine(ex.ToString());
                 }
                 finally
