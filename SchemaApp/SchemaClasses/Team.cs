@@ -4,8 +4,8 @@ using System.Text;
 
 namespace SchemaClasses
 {
-    public class Subject : DBModel
+    public class Team : DBModel
     {
-        public string Name { get; set; }
+        public string teamName { get; set; }
     }
 }

@@ -28,9 +28,11 @@ namespace GUILayer
 
             createEditForm<Student>();
             createEditForm<Teacher>();
+            createEditForm<Subject>();
+            createEditForm<Team>();
         }
 
-        public void createEditForm<T>() where T : Person
+        public void createEditForm<T>() where T : DBModel
         {
             Type tclass = typeof(T);
 
@@ -73,7 +75,7 @@ namespace GUILayer
 
             }
 
-            void saveEditForm(object sender, RoutedEventArgs e)
+            /*void saveEditForm(object sender, RoutedEventArgs e)
             {
                 string firstName = "", lastName = "";
 
@@ -89,7 +91,41 @@ namespace GUILayer
                     }
                 }
 
-                PersonController.CreatePerson<T>(firstName, lastName);
+                PersonController.CreateInstance<T>(firstName, lastName);
+            }*/
+
+            void saveEditForm(object sender, RoutedEventArgs e)
+            {
+                /*string firstName = "", lastName = "";
+
+                foreach (FieldStackPanel field in fieldStackList)
+                {
+                    if (field.FieldNameBox.Text == "FirstName")
+                    {
+                        firstName = field.InputFieldBox.Text;
+                    }
+                    else if (field.FieldNameBox.Text == "LastName")
+                    {
+                        lastName = field.InputFieldBox.Text;
+                    }
+                }*/
+
+                T instance = DBController.CreateInstance<T>();
+                Type type = instance.GetType();
+
+                foreach (FieldStackPanel field in fieldStackList)
+                {
+                    try
+                    {
+                        type.GetProperty(field.FieldNameBox.Text).SetValue(instance, field.InputFieldBox.Text);
+                    } catch
+                    {
+                        Console.WriteLine("Failed to write value");
+                    }
+                    
+                }
+                DBController.Save(instance);
+
             }
 
             Button saveButton = new Button();

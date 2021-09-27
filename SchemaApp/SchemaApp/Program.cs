@@ -45,7 +45,7 @@ namespace SchemaApp
             Environment.Exit(0);*/
 
             // TODO Kevin: Testing stuff.
-            Person person = PersonController.CreatePerson<Student>("Kiv", "Test1234!");
+            Person person = PersonController.CreateInstance<Student>("Kiv", "Test1234!");
             person.LastName = "lol";
             PersonController.Save(person);
         }

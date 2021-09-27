@@ -41,11 +41,15 @@ namespace SchemaClasses
                     // TODO Kevin: Perhaps handle user feedback here.
                     throw e;
                 }
+                catch (NullReferenceException)
+                {
+                    Console.WriteLine($"{instance.GetType().Name} does not contain a validator.");
+                }
             }
 
             // TODO Kevin: We must recursively walk upwards in the class hierarchy to get and save the attributes of each class individually.
 
-            // Get the properties of the Person class.
+            /*// Get the properties of the Person class.
             HashSet<PropertyInfo> personPropSet = new HashSet<PropertyInfo>(typeof(Person).GetProperties());
 
             // Get the names of the properties of the Person class.
@@ -55,7 +59,7 @@ namespace SchemaClasses
 
             // Get all the properties of the subclass, which aren't defined by Person.
             HashSet<PropertyInfo> tPropSet = new HashSet<PropertyInfo>(
-                from prop in instance.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);
+                from prop in instance.GetType().GetProperties() where !personPropSetNames.Contains(prop.Name) select prop);*/
 
             string _convertSaveString(PropertyInfo prop)
             {
@@ -90,18 +94,45 @@ namespace SchemaClasses
                 (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, conn);
 
                 // These are the field names, followed by their values, that should be saved at this recursion level.
-                IEnumerable<string> orderedFieldsNamesToSave = from field in currType.GetProperties() where !savedFields.Contains(field.Name) select field.Name;
-                IEnumerable<string> orderedFieldValuesToSave = from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName));
+                List<string> orderedFieldsNamesToSave = (from field in currType.GetProperties() where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
+                List<string> orderedFieldValuesToSave = (from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName))).ToList();
+
+                object[] _invalidBasetypes = new object[] { typeof(DBModel), null };
+
+                if (!_invalidBasetypes.Contains(currType.BaseType) && PKValue != null)
+                {
+                    orderedFieldsNamesToSave.Add(currType.BaseType.Name);
+                    orderedFieldValuesToSave.Add(PKValue);
+                }
 
                 // The current model doesn't define any unsaved fields, so we don't save anything for it.
                 // TODO Kevin: This may not be the case for certain intermediate models where primary keys still need to be handled.
                 if (orderedFieldsNamesToSave.Count() == 0)
                     return (PKValue, savedFields);
 
-                // TODO Kevin use somehow: currType.BaseType.Name
+                // TODO Kevin: Thread-safe get max PK
 
-                string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");";
-                new MySqlCommand(sql, conn).ExecuteNonQuery();
+                // TODO Kevin: This seems clunky.
+                string PKColumn;
+                if (currType.BaseType == typeof(DBModel))
+                {
+                    IEnumerable<string> PKColumns = from field in currType.GetProperties() where field.Name.ToLower().EndsWith("id") select field.Name;
+                    if (PKColumns.Count() != 1)
+                        throw new Exception("Database models using inheritance must define exactly 1 primary key column.");
+                    PKColumn = PKColumns.First();
+                } else
+                {
+                    string baseName = currType.BaseType.Name;
+                    PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
+                }
+
+                string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");\nSELECT max({PKColumn}) FROM {currType.Name};";
+                MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
+
+                // Update the personID of the now saved person.
+                rdr.Read();
+                PKValue = rdr[0].ToString();
+                rdr.Close();
 
                 foreach (string fieldName in orderedFieldsNamesToSave)
                     savedFields.Add(fieldName);
@@ -118,10 +149,11 @@ namespace SchemaClasses
                     conn.Open();
 
                     // Saving a new person, uses INSERT 
-                    if ((from tuple in getPrimaryKeys(instance) where tuple.Item2 != null select tuple).Count() != 0)
+                    if ((from tuple in getPrimaryKeys(instance) where tuple.Item2 == null select tuple).Count() != 0)
                     {
+                        saveCurrentTable(instance.GetType(), conn);
                         // As hashsets are not ordered, we create these arrays, such that the property names and values are placed on the same indexes.
-                        var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(instance, null) != null select propName;
+                        /*var personPropNameArray = from propName in personPropSetNames where personType.GetProperty(propName).GetValue(instance, null) != null select propName;
                         var personPropValueArray = from propName in personPropNameArray select _convertSaveString(personType.GetProperty(propName));
 
                         var tPropNameArray = from prop in tPropSet where personType.GetProperty(prop.Name).GetValue(instance, null) != null select prop.Name;
@@ -137,11 +169,11 @@ namespace SchemaClasses
 
                         // TODO Kevin: SQL is broken when no other properties are present.
                         sql = $"INSERT INTO {instance.GetType().Name}(person, {string.Join(", ", tPropNameArray)}) VALUES ({instance.personID}, \"{string.Join("\", \"", tPropValueArray)}\");";
-                        new MySqlCommand(sql, conn).ExecuteReader();
+                        new MySqlCommand(sql, conn).ExecuteReader();*/
                     }
                     else  // Saving an existing person, uses UPDATE
                     {
-
+                        throw new NotImplementedException("Cannot update DBModels yet");
                     }
 
 
@@ -157,6 +189,11 @@ namespace SchemaClasses
                 }
             }
         }
+
+        public static T CreateInstance<T>() where T : DBModel
+        {
+            return Activator.CreateInstance<T>();
+        }
     }
 
     public abstract class PersonController : DBController
@@ -167,7 +204,7 @@ namespace SchemaClasses
             throw new NotImplementedException();
         }
 
-        public static T CreatePerson<T>(string firstName, string lastName) where T : Person
+        public static T CreateInstance<T>(string firstName, string lastName) where T : Person
         {
             T person = Activator.CreateInstance<T>();
             person.FirstName = firstName;
