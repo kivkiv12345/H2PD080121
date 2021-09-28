@@ -18,7 +18,21 @@ namespace SchemaClasses
 
     public class DatabaseManager
     {
-        public static readonly string ConnectionString = "server=localhost;user=root;database=schema_H2;port=3306;password=Test1234!";
+        public string password = null;
+        public string username = "root";
+        public string host = "localhost";
+        public int port = 3306;
+        public string ConnectionString 
+        { 
+            get { 
+                return $"server={this.host};user={this.username};database=schema_H2;port={this.port};password={this.password}"; 
+            } 
+        }
+
+        public DatabaseManager(string password)
+        {
+            this.password = password;
+        }
 
         /// <summary>
         /// Creates database tables for the specified models.

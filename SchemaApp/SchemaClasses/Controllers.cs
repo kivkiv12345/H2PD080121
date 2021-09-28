@@ -9,6 +9,9 @@ namespace SchemaClasses
 {
     public abstract class DBController
     {
+        // TODO Kevin: This seems like a terrible place to store an instance of the manager.
+        public static DatabaseManager DBManager;
+
         private delegate string saveStringConverter(object input);
 
         /// <summary>
@@ -152,7 +155,7 @@ namespace SchemaClasses
                 return (PKValue, savedFields);
             }
 
-            using (MySqlConnection conn = new MySqlConnection(DatabaseManager.ConnectionString))
+            using (MySqlConnection conn = new MySqlConnection(DBManager.ConnectionString))
             {
                 try
                 {

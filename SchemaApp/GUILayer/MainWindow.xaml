@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <DockPanel>
+        
         <StackPanel x:Name="editorButtonStack" HorizontalAlignment="Left" MinWidth="100" DockPanel.Dock="Left">
             
         </StackPanel>

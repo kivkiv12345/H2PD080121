@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Web API Client</title>
+    <script src="Scripts/jquery-3.0.0.min.js"></script>
+    <link href="CSS/StyleSheet.css" rel="stylesheet" />
+    <link href="CSS/Lommeregner.css" rel="stylesheet" />
+    <link rel="stylesheet" href="CSS/api.css" />
+</head>
+
+<body onload="MakeTopMenuBar();">
+    <div id="TopMenuBarContent"></div>
+
+    <br />
+
+    <h1>To-do CRUD</h1>
+    <h3>Add</h3>
+    <form action="javascript:void(0);" method="POST" onsubmit="addItem()">
+        <input type="text" id="add-name" placeholder="New name">
+        <input type="text" id="add-description" placeholder="New description">
+        <select id="add-countrySelect" placeholder="New countryid"></select>
+        <input type="submit" value="Add">
+    </form>
+
+    <div id="editForm">
+        <h3>Edit</h3>
+        <form action="javascript:void(0);" onsubmit="updateItem()">
+            <input type="hidden" id="edit-id">
+            <input type="text" id="edit-name">
+            <input type="text" id="edit-description">
+            <select id="edit-countrySelect"></select>
+            <select multiple id="edit-languages"></select>
+            <input type="submit" value="Save">
+            <a onclick="closeInput()" aria-label="Close">&#10006;</a>
+        </form>
+    </div>
+
+    <p id="counter"></p>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Country</th>
+            <th>Languages</th>
+            <th></th> <!-- Edit Button -->
+            <th></th> <!-- Delete Button -->
+        </tr>
+        <tbody id="responseTable"></tbody>
+    </table>
+
+    <script src="ScriptFiles/apirdms.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        getItems();
+    </script>
+
+
+</body>
+
+</html>
+
+<script src="ScriptFiles/MenuBar.js"></script>
+
+

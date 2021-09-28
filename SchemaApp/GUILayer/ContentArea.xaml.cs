@@ -9,6 +9,7 @@ namespace GUILayer
     {
         public ContentArea()
         {
-            InitializeComponent();        }
+            InitializeComponent();        
+        }
     }
 }

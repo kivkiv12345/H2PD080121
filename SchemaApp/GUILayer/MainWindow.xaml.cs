@@ -30,6 +30,8 @@ namespace GUILayer
             createEditForm<Teacher>();
             createEditForm<Subject>();
             createEditForm<Team>();
+
+            editorButtonStack.IsEnabled = false;
         }
 
         public void createEditForm<T>() where T : DBModel
