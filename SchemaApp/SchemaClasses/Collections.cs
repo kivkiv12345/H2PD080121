@@ -9,7 +9,7 @@ namespace SchemaClasses
     /// </summary>
     static class Collections
     {
-        public static HashSet<CampusTeam> CampusTeams = new HashSet<CampusTeam>();
+        public static HashSet<CampusTeamCollection> CampusTeams = new HashSet<CampusTeamCollection>();
 
         public static HashSet<Person> People = new HashSet<Person>();
 
