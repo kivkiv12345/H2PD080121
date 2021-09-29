@@ -13,7 +13,9 @@
         </StackPanel>
 
         <local:ContentArea x:Name="ContentView" DockPanel.Dock="Right">
-            
+            <local:DatabaseLogin>
+                
+            </local:DatabaseLogin>
         </local:ContentArea>
     </DockPanel>
     

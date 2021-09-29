@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {}
+    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {
+    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
+        "projectUniqueName": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
         "projectName": "GUILayer",
-        "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
-        "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\obj\\",
+        "projectPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\GUILayer.csproj",
+        "packagesPath": "C:\\Users\\kevin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\GUILayer\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -28,8 +28,8 @@
           "net5.0-windows7.0": {
             "targetAlias": "net5.0-windows",
             "projectReferences": {
-              "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
-                "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj"
+              "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
+                "projectPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj"
               }
             }
           }
@@ -61,21 +61,21 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
+    "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
+        "projectUniqueName": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
         "projectName": "SchemaClasses",
-        "projectPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
-        "packagesPath": "C:\\Users\\Kevin\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\obj\\",
+        "projectPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\SchemaClasses.csproj",
+        "packagesPath": "C:\\Users\\kevin\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\kevin\\source\\repos\\H2PD080121\\SchemaApp\\SchemaClasses\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\kevin\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -121,7 +121,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }
