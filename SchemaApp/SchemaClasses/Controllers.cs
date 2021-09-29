@@ -25,35 +25,28 @@ namespace SchemaClasses
             })},
         };
 
-        private static IEnumerable<(string, object)> getPrimaryKeys(DBModel instance)
+        private static IEnumerable<(string, object)> getPrimaryKeys(DataModel instance)
         {
             // TODO Kevin: This will break when non primary key columns end with 'id'.
-            return from field in instance.GetType().GetProperties() where field.Name.ToLower().EndsWith("id") select (field.Name, field.GetValue(instance, null));
+            PropertyInfo[] currProps = instance.GetType().GetProperties();
+            IEnumerable<(string, object)> PKs = from field in currProps where field.Name.ToLower().EndsWith("id") select (field.Name, field.GetValue(instance, null));
+            return PKs.Count() > 0 ? PKs : new (string, object)[] { (currProps.First().Name, currProps.First().GetValue(instance, null)) };
         }
 
-        private enum SaveModes
+        public static void Save(DataModel instance)
         {
-            INSERT,
-            UPDATE,
-        }
-
-        public static void Save(DBModel instance, bool validate = true)
-        {
-            if (validate)
+            try
             {
-                try
-                {
-                    instance.validate();
-                }
-                catch (ValidationError e)
-                {
-                    // TODO Kevin: Perhaps handle user feedback here.
-                    throw e;
-                }
-                catch (NullReferenceException)
-                {
-                    Console.WriteLine($"{instance.GetType().Name} does not contain a validator.");
-                }
+                instance.validate();
+            }
+            catch (ValidationError e)
+            {
+                // TODO Kevin: Perhaps handle user feedback here.
+                throw e;
+            }
+            catch (NullReferenceException)
+            {
+                Console.WriteLine($"{instance.GetType().Name} does not contain a validator.");
             }
 
             string _convertSaveString(PropertyInfo prop)
@@ -61,8 +54,11 @@ namespace SchemaClasses
                 var value = prop.GetValue(instance, null);
                 try
                 {
-                    if (value is DBModel)
-                        return PersonController.getPrimaryKeys((DBModel)value).First().Item1;
+                    if (value is DataModel)
+                    {
+                        DBController.Save((DataModel)value);
+                        return PersonController.getPrimaryKeys((DataModel)value).First().Item2.ToString();
+                    }
                     return saveConversions[prop.PropertyType](value);
                 }
                 catch (KeyNotFoundException)
@@ -78,7 +74,7 @@ namespace SchemaClasses
             /// </summary>
             /// <param name="currTupe">A subclass of DBModel, of which properties should be saved.</param>
             /// <returns>The properties that were saved.</returns>
-            (string?, HashSet<string>) saveCurrentTable(Type currType, SaveModes mode, MySqlConnection conn)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
+            (string?, HashSet<string>) saveCurrentTable(Type currType, MySqlConnection conn)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
             {
                 // TODO Kevin: We might not want the connection to be passed as a parameter.
 
@@ -89,7 +85,7 @@ namespace SchemaClasses
                     return (null, new HashSet<string>());
 
                 // These are the fields that have already been handled. We need them to know which current fields to exclude.
-                (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, mode, conn);
+                (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, conn);
 
                 PropertyInfo[] currentProperties = currType.GetProperties();
 
@@ -97,7 +93,7 @@ namespace SchemaClasses
                 List<string> orderedFieldsNamesToSave = (from field in currentProperties where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
                 List<string> orderedFieldValuesToSave = (from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName))).ToList();
 
-                object[] _invalidBasetypes = new object[] { typeof(DBModel), null };
+                object[] _invalidBasetypes = new object[] { typeof(DataModel), null };
 
                 if (!_invalidBasetypes.Contains(currType.BaseType) && PKValue != null)
                 {
@@ -114,17 +110,20 @@ namespace SchemaClasses
 
                 // TODO Kevin: This seems clunky.
                 string PKColumn;
-                if (currType.BaseType == typeof(DBModel))
+                if (currType.BaseType == typeof(DataModel))
                 {
                     IEnumerable<string> PKColumns = from field in currentProperties where field.Name.ToLower().EndsWith("id") select field.Name;
-                    //if (PKColumns.Count() != 1)
-                    //    throw new Exception("Database models using inheritance must define exactly 1 explicit primary key column.");
+
+                    if (PKColumns.Count() != 1 && typeof(DataModel) != instance.GetType().BaseType)
+                        throw new Exception("Database models using inheritance must define exactly 1 explicit primary key column.");
+
                     try
                     {
                         PKColumn = PKColumns.First();
                     }
                     catch (InvalidOperationException)
                     {
+                        // Assume the first property to be the primary key, when no more suitable column could be found.
                         PKColumn = currentProperties.First().Name;
                     }
                 }
@@ -134,7 +133,13 @@ namespace SchemaClasses
                     PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
                 }
 
-                if (mode == SaveModes.INSERT)
+                if (instance.isSaved)
+                {
+                    IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
+                    string sql = $"UPDATE {currType.Name} SET {string.Join(", ", fieldAndValue)} WHERE {PKColumn} = {currType.GetProperty(PKColumn).GetValue(instance, null)};";
+                    new MySqlCommand(sql, conn).ExecuteNonQuery();
+                }
+                else
                 {
                     string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");\nSELECT max({PKColumn}) FROM {currType.Name};";
                     MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
@@ -150,16 +155,6 @@ namespace SchemaClasses
                     {
                     }
                     rdr.Close();
-                }
-                else if (mode == SaveModes.UPDATE)
-                {
-                    IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
-                    string sql = $"UPDATE {currType.Name} SET {string.Join(", ", fieldAndValue)} WHERE {PKColumn} = {currType.GetProperty(PKColumn).GetValue(instance, null)};";
-                    new MySqlCommand(sql, conn).ExecuteNonQuery();
-                }
-                else
-                {
-                    throw new Exception("Unsupported save mode");
                 }
 
 
@@ -177,14 +172,8 @@ namespace SchemaClasses
 
                     new MySqlCommand("START TRANSACTION;", conn).ExecuteNonQuery();
 
-                    SaveModes mode;
-                    // Saving a new person, uses INSERT 
-                    if ((from tuple in getPrimaryKeys(instance) where tuple.Item2 == null select tuple).Count() != 0)
-                        mode = SaveModes.INSERT;
-                    else  // Saving an existing person, uses UPDATE
-                        mode = SaveModes.UPDATE;
-
-                    saveCurrentTable(instance.GetType(), mode, conn);
+                    saveCurrentTable(instance.GetType(), conn);
+                    instance.isSaved = true;
 
                     new MySqlCommand("COMMIT;", conn).ExecuteNonQuery();
 
@@ -201,7 +190,7 @@ namespace SchemaClasses
             }
         }
 
-        public static T CreateInstance<T>() where T : DBModel
+        public static T CreateInstance<T>() where T : DataModel
         {
             return Activator.CreateInstance<T>();
         }

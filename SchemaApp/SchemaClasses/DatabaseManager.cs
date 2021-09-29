@@ -9,8 +9,10 @@ namespace SchemaClasses
     /// It is specifically designed for serializing classes for databases.
     /// Properties with names suffixed by "ID" are taken to be primary keys.
     /// </summary>
-    public abstract class DBModel
+    public abstract class DataModel
     {
+        public bool isSaved = false;
+
         public Validator validate;
 
         public delegate void Validator();

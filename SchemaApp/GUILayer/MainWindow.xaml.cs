@@ -34,7 +34,7 @@ namespace GUILayer
             //editorButtonStack.IsEnabled = false;
         }
 
-        public void createEditForm<T>() where T : DBModel
+        public void createEditForm<T>() where T : DataModel
         {
             Type tclass = typeof(T);
 

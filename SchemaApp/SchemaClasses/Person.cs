@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SchemaClasses
 {
-    public abstract class Person : DBModel
+    public abstract class Person : DataModel
     {
         public ulong? personId { get; set; }
         public string FirstName { get; set; }

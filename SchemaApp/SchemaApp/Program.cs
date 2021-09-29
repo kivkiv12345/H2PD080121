@@ -17,15 +17,21 @@ namespace SchemaApp
             Console.WriteLine("Please enter the MySQL password");
             PersonController.DBManager = new DatabaseManager(Console.ReadLine());
 
+            // TODO Kevin: Testing stuff.
+            Student person = PersonController.CreateInstance<Student>("Kiv", "Test1234!");
+            person.LastName = "lol";
             CampusTeam team = DBController.CreateInstance<CampusTeam>();
-            team.teamName = "HHHHHHHHHH1";
+            team.teamName = "hhhhhhhhh70";
+            person.Team = team;
+            PersonController.Save(person);
+            Environment.Exit(0);
+
+            CampusTeam teamm = DBController.CreateInstance<CampusTeam>();
+            teamm.teamName = "HHHHHHHHHH1";
             DBController.Save(team);
             Environment.Exit(0);
             
-            // TODO Kevin: Testing stuff.
-            Person person = PersonController.CreateInstance<Student>("Kiv", "Test1234!");
-            person.LastName = "lol";
-            PersonController.Save(person);
+            
         }
     }
 }

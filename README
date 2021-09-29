@@ -1,0 +1,5 @@
+While I must admit that experimenting with generics and reflection has been an interesting endeavour,
+it has also been increasingly frustrating, due to what I can only perceive as poor design of the C# language.
+Questions such as: "Why can't interfaces have static members?" and "Why can't static classes inherit from each other?"
+have been a constant during the development and have led to increasingly obtuse designs and constructions,
+such as using abstract classes consisting of nothing but static members, as a workaround for inheriting static classes.
