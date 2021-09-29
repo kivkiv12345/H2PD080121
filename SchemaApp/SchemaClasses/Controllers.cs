@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace SchemaClasses
 {
@@ -28,6 +27,7 @@ namespace SchemaClasses
 
         private static IEnumerable<(string, object)> getPrimaryKeys(DBModel instance)
         {
+            // TODO Kevin: This will break when non primary key columns end with 'id'.
             return from field in instance.GetType().GetProperties() where field.Name.ToLower().EndsWith("id") select (field.Name, field.GetValue(instance, null));
         }
 
@@ -61,6 +61,8 @@ namespace SchemaClasses
                 var value = prop.GetValue(instance, null);
                 try
                 {
+                    if (value is DBModel)
+                        return PersonController.getPrimaryKeys((DBModel)value).First().Item1;
                     return saveConversions[prop.PropertyType](value);
                 }
                 catch (KeyNotFoundException)
@@ -89,8 +91,10 @@ namespace SchemaClasses
                 // These are the fields that have already been handled. We need them to know which current fields to exclude.
                 (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, mode, conn);
 
+                PropertyInfo[] currentProperties = currType.GetProperties();
+
                 // These are the field names, followed by their values, that should be saved at this recursion level.
-                List<string> orderedFieldsNamesToSave = (from field in currType.GetProperties() where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
+                List<string> orderedFieldsNamesToSave = (from field in currentProperties where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
                 List<string> orderedFieldValuesToSave = (from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName))).ToList();
 
                 object[] _invalidBasetypes = new object[] { typeof(DBModel), null };
@@ -112,11 +116,19 @@ namespace SchemaClasses
                 string PKColumn;
                 if (currType.BaseType == typeof(DBModel))
                 {
-                    IEnumerable<string> PKColumns = from field in currType.GetProperties() where field.Name.ToLower().EndsWith("id") select field.Name;
-                    if (PKColumns.Count() != 1)
-                        throw new Exception("Database models using inheritance must define exactly 1 primary key column.");
-                    PKColumn = PKColumns.First();
-                } else
+                    IEnumerable<string> PKColumns = from field in currentProperties where field.Name.ToLower().EndsWith("id") select field.Name;
+                    //if (PKColumns.Count() != 1)
+                    //    throw new Exception("Database models using inheritance must define exactly 1 explicit primary key column.");
+                    try
+                    {
+                        PKColumn = PKColumns.First();
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        PKColumn = currentProperties.First().Name;
+                    }
+                }
+                else
                 {
                     string baseName = currType.BaseType.Name;
                     PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
@@ -138,19 +150,21 @@ namespace SchemaClasses
                     {
                     }
                     rdr.Close();
-                } else if (mode == SaveModes.UPDATE)
+                }
+                else if (mode == SaveModes.UPDATE)
                 {
                     IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
                     string sql = $"UPDATE {currType.Name} SET {string.Join(", ", fieldAndValue)} WHERE {PKColumn} = {currType.GetProperty(PKColumn).GetValue(instance, null)};";
                     new MySqlCommand(sql, conn).ExecuteNonQuery();
-                } else
+                }
+                else
                 {
                     throw new Exception("Unsupported save mode");
                 }
-                
 
-                foreach (string fieldName in orderedFieldsNamesToSave)
-                    savedFields.Add(fieldName);
+
+                foreach (PropertyInfo field in currentProperties)
+                    savedFields.Add(field.Name);
 
                 return (PKValue, savedFields);
             }
@@ -166,13 +180,9 @@ namespace SchemaClasses
                     SaveModes mode;
                     // Saving a new person, uses INSERT 
                     if ((from tuple in getPrimaryKeys(instance) where tuple.Item2 == null select tuple).Count() != 0)
-                    {
                         mode = SaveModes.INSERT;
-                    }
                     else  // Saving an existing person, uses UPDATE
-                    {
                         mode = SaveModes.UPDATE;
-                    }
 
                     saveCurrentTable(instance.GetType(), mode, conn);
 
@@ -216,13 +226,13 @@ namespace SchemaClasses
         /// <summary> Removes the provided person from the specified teams. </summary>
         /// <param name="person"> Person which should be removed from the specified teams. </param>
         /// <param name="teams"> Enumerable of teams from which the person should be removed when present. </param>
-        public static void RemoveFromTeams(Person person, IEnumerable<CampusTeam> teams)
+        public static void RemoveFromTeams(Person person, IEnumerable<CampusTeamCollection> teams)
         {
             // Ensure that the specified teams intersect with the teams of the person.
-            HashSet<CampusTeam> inSet = new HashSet<CampusTeam>(teams);
+            HashSet<CampusTeamCollection> inSet = new HashSet<CampusTeamCollection>(teams);
             inSet.IntersectWith(GetTeams(person));
 
-            foreach (CampusTeam team in inSet)
+            foreach (CampusTeamCollection team in inSet)
                 team.Remove(person);
         }
 
@@ -230,14 +240,14 @@ namespace SchemaClasses
         /// <param name="person"> Person which should be removed from all its teams. </param>
         public static void RemoveFromTeams(Person person)
         {
-            foreach (CampusTeam team in GetTeams(person))
+            foreach (CampusTeamCollection team in GetTeams(person))
                 team.Remove(person);
         }
 
         /// <summary> Removes the provided person from the specified team. </summary>
         /// <param name="person"> Person which should be removed. </param>
         /// <param name="team"> Team from which the person should be removed. </param>
-        public static void RemoveFromTeams(Person person, CampusTeam team)
+        public static void RemoveFromTeams(Person person, CampusTeamCollection team)
         {
             team.Remove(person);
         }
@@ -245,7 +255,7 @@ namespace SchemaClasses
         /// <summary> Adds the provided person to the specified team. </summary>
         /// <param name="person"> Person which should be added. </param>
         /// <param name="team"> Team to which the person should be added. </param>
-        public static void AddToTeams(Person person, CampusTeam team)
+        public static void AddToTeams(Person person, CampusTeamCollection team)
         {
             team.Add(person);
         }
@@ -253,17 +263,17 @@ namespace SchemaClasses
         /// <summary> Adds the provided person to the specified teams. </summary>
         /// <param name="person"> Person which should be added. </param>
         /// <param name="team"> Teams to which the person should be added. </param>
-        public static void AddToTeams(Person person, IEnumerable<CampusTeam> teams)
+        public static void AddToTeams(Person person, IEnumerable<CampusTeamCollection> teams)
         {
-            foreach (CampusTeam team in teams)
+            foreach (CampusTeamCollection team in teams)
                 team.Add(person);
         }
 
         /// <returns> A HashSet of the CampusTeams the provided person is included in. </returns>
-        public static HashSet<CampusTeam> GetTeams(Person person)  // GetTeams is convenient, but probably increases coupling.
+        public static HashSet<CampusTeamCollection> GetTeams(Person person)  // GetTeams is convenient, but probably increases coupling.
         {
-            HashSet<CampusTeam> returnTeams = new HashSet<CampusTeam>();
-            foreach (CampusTeam team in Collections.CampusTeams)
+            HashSet<CampusTeamCollection> returnTeams = new HashSet<CampusTeamCollection>();
+            foreach (CampusTeamCollection team in Collections.CampusTeams)
                 if (team.Contains(person))
                     returnTeams.Add(team);
             return returnTeams;
@@ -279,13 +289,13 @@ namespace SchemaClasses
         public static HashSet<T> GetRelatedTeam<T>(Person person) where T : Person
         {
             HashSet<T> returnSet = new HashSet<T>();
-            foreach (CampusTeam team in PersonController.GetTeams(person))
+            foreach (CampusTeamCollection team in PersonController.GetTeams(person))
                 if (team.Contains(person))
                     foreach (T relatedPerson in team.membersOfType<T>())
                         returnSet.Add(relatedPerson);
             return returnSet;
         }
 
-        
+
     }
 }

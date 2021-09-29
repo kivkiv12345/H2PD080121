@@ -5,7 +5,7 @@ namespace SchemaClasses
 {
     public abstract class Person : DBModel
     {
-        public ulong? personID { get; set; }
+        public ulong? personId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime? Birthday { get; set; }
@@ -31,7 +31,7 @@ namespace SchemaClasses
 
     public sealed class Student : Person
     {
-        //public Grades Grade { get; set; }  // TODO Kevin: Testing
+        public CampusTeam Team { get; set; }
 
         public void _ValidateStudent()
         {

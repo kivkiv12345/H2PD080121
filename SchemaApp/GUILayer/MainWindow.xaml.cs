@@ -29,9 +29,9 @@ namespace GUILayer
             createEditForm<Student>();
             createEditForm<Teacher>();
             createEditForm<Subject>();
-            createEditForm<Team>();
+            createEditForm<CampusTeam>();
 
-            editorButtonStack.IsEnabled = false;
+            //editorButtonStack.IsEnabled = false;
         }
 
         public void createEditForm<T>() where T : DBModel
@@ -77,40 +77,8 @@ namespace GUILayer
 
             }
 
-            /*void saveEditForm(object sender, RoutedEventArgs e)
-            {
-                string firstName = "", lastName = "";
-
-                foreach (FieldStackPanel field in fieldStackList)
-                {
-                    if (field.FieldNameBox.Text == "FirstName")
-                    {
-                        firstName = field.InputFieldBox.Text;
-                    } 
-                    else if (field.FieldNameBox.Text == "LastName")
-                    {
-                        lastName = field.InputFieldBox.Text;
-                    }
-                }
-
-                PersonController.CreateInstance<T>(firstName, lastName);
-            }*/
-
             void saveEditForm(object sender, RoutedEventArgs e)
             {
-                /*string firstName = "", lastName = "";
-
-                foreach (FieldStackPanel field in fieldStackList)
-                {
-                    if (field.FieldNameBox.Text == "FirstName")
-                    {
-                        firstName = field.InputFieldBox.Text;
-                    }
-                    else if (field.FieldNameBox.Text == "LastName")
-                    {
-                        lastName = field.InputFieldBox.Text;
-                    }
-                }*/
 
                 T instance = DBController.CreateInstance<T>();
                 Type type = instance.GetType();

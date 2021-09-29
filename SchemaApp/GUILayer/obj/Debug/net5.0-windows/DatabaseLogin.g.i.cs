@@ -125,7 +125,7 @@ namespace GUILayer {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/GUILayer;component/databaselogin.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/GUILayer;V1.0.0.0;component/databaselogin.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\DatabaseLogin.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);
