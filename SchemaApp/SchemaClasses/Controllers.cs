@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace SchemaClasses
 {
-    public abstract class DBController
+    public abstract class DataController
     {
         // TODO Kevin: This seems like a terrible place to store an instance of the manager.
         public static DatabaseManager DBManager;
@@ -33,6 +33,12 @@ namespace SchemaClasses
             return PKs.Count() > 0 ? PKs : new (string, object)[] { (currProps.First().Name, currProps.First().GetValue(instance, null)) };
         }
 
+        private static object[] _invalidBasetypes = new object[] { typeof(DataModel), null };
+
+        /// <summary>
+        /// Creates or updates a record in the database according to the provided DataModel.
+        /// </summary>
+        /// <param name="instance">The object to save</param>
         public static void Save(DataModel instance)
         {
             try
@@ -56,7 +62,7 @@ namespace SchemaClasses
                 {
                     if (value is DataModel)
                     {
-                        DBController.Save((DataModel)value);
+                        DataController.Save((DataModel)value);
                         return PersonController.getPrimaryKeys((DataModel)value).First().Item2.ToString();
                     }
                     return saveConversions[prop.PropertyType](value);
@@ -69,110 +75,108 @@ namespace SchemaClasses
 
             Type instanceType = instance.GetType();
 
-            /// <summary>
-            /// Saves a specific class to a specific table. Handles subclasses.
-            /// </summary>
-            /// <param name="currTupe">A subclass of DBModel, of which properties should be saved.</param>
-            /// <returns>The properties that were saved.</returns>
-            (string?, HashSet<string>) saveCurrentTable(Type currType, MySqlConnection conn)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
-            {
-                // TODO Kevin: We might not want the connection to be passed as a parameter.
-
-                // We just attempted to save a nonexistent base class (most likely because we just walked to the top the inheritance hierarchy),
-                // hence no fields were saved. We therefore create and return an empty hashset, indicating to the previous recursion level,
-                // that all its found fields should be saved under its model.
-                if (currType == null)
-                    return (null, new HashSet<string>());
-
-                // These are the fields that have already been handled. We need them to know which current fields to exclude.
-                (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType, conn);
-
-                PropertyInfo[] currentProperties = currType.GetProperties();
-
-                // These are the field names, followed by their values, that should be saved at this recursion level.
-                List<string> orderedFieldsNamesToSave = (from field in currentProperties where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
-                List<string> orderedFieldValuesToSave = (from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName))).ToList();
-
-                object[] _invalidBasetypes = new object[] { typeof(DataModel), null };
-
-                if (!_invalidBasetypes.Contains(currType.BaseType) && PKValue != null)
-                {
-                    orderedFieldsNamesToSave.Add(currType.BaseType.Name);
-                    orderedFieldValuesToSave.Add(PKValue);
-                }
-
-                // The current model doesn't define any unsaved fields, so we don't save anything for it.
-                // TODO Kevin: This may not be the case for certain intermediate models where primary keys still need to be handled.
-                if (orderedFieldsNamesToSave.Count() == 0)
-                    return (PKValue, savedFields);
-
-                // TODO Kevin: Thread-safe get max PK
-
-                // TODO Kevin: This seems clunky.
-                string PKColumn;
-                if (currType.BaseType == typeof(DataModel))
-                {
-                    IEnumerable<string> PKColumns = from field in currentProperties where field.Name.ToLower().EndsWith("id") select field.Name;
-
-                    if (PKColumns.Count() != 1 && typeof(DataModel) != instance.GetType().BaseType)
-                        throw new Exception("Database models using inheritance must define exactly 1 explicit primary key column.");
-
-                    try
-                    {
-                        PKColumn = PKColumns.First();
-                    }
-                    catch (InvalidOperationException)
-                    {
-                        // Assume the first property to be the primary key, when no more suitable column could be found.
-                        PKColumn = currentProperties.First().Name;
-                    }
-                }
-                else
-                {
-                    string baseName = currType.BaseType.Name;
-                    PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
-                }
-
-                if (instance.isSaved)
-                {
-                    IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
-                    string sql = $"UPDATE {currType.Name} SET {string.Join(", ", fieldAndValue)} WHERE {PKColumn} = {currType.GetProperty(PKColumn).GetValue(instance, null)};";
-                    new MySqlCommand(sql, conn).ExecuteNonQuery();
-                }
-                else
-                {
-                    string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");\nSELECT max({PKColumn}) FROM {currType.Name};";
-                    MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
-
-                    // Update the personID of the now saved person.
-                    rdr.Read();
-                    PKValue = rdr[0].ToString();
-                    try
-                    {
-                        currType.GetProperty(PKColumn).SetValue(instance, rdr[0]);
-                    }
-                    catch
-                    {
-                    }
-                    rdr.Close();
-                }
-
-
-                foreach (PropertyInfo field in currentProperties)
-                    savedFields.Add(field.Name);
-
-                return (PKValue, savedFields);
-            }
-
             using (MySqlConnection conn = new MySqlConnection(DBManager.ConnectionString))
             {
+                /// <summary>
+                /// Saves a specific class to a specific table. Handles subclasses.
+                /// </summary>
+                /// <param name="currTupe">A subclass of DBModel, of which properties should be saved.</param>
+                /// <returns>The properties that were saved.</returns>
+                (string?, HashSet<string>) saveCurrentTable(Type currType)  // Method inspired by: https://stackoverflow.com/questions/8868119/find-all-parent-types-both-base-classes-and-interfaces
+                {
+                    // TODO Kevin: We might not want the connection to be passed as a parameter.
+
+                    // We just attempted to save a nonexistent base class (most likely because we just walked to the top the inheritance hierarchy),
+                    // hence no fields were saved. We therefore create and return an empty hashset, indicating to the previous recursion level,
+                    // that all its found fields should be saved under its model.
+                    if (currType == null)
+                        return (null, new HashSet<string>());
+
+                    // These are the fields that have already been handled. We need them to know which current fields to exclude.
+                    (string PKValue, HashSet<string> savedFields) = saveCurrentTable(currType.BaseType);
+
+                    PropertyInfo[] currentProperties = currType.GetProperties();
+
+                    // These are the field names, followed by their values, that should be saved at this recursion level.
+                    List<string> orderedFieldsNamesToSave = (from field in currentProperties where !savedFields.Contains(field.Name) && field.GetValue(instance, null) != null select field.Name).ToList();
+                    List<string> orderedFieldValuesToSave = (from fieldName in orderedFieldsNamesToSave select _convertSaveString(currType.GetProperty(fieldName))).ToList();
+
+                    if (!_invalidBasetypes.Contains(currType.BaseType) && PKValue != null)
+                    {
+                        orderedFieldsNamesToSave.Add(currType.BaseType.Name);
+                        orderedFieldValuesToSave.Add(PKValue);
+                    }
+
+                    // The current model doesn't define any unsaved fields, so we don't save anything for it.
+                    // TODO Kevin: This may not be the case for certain intermediate models where primary keys still need to be handled.
+                    if (orderedFieldsNamesToSave.Count() == 0)
+                        return (PKValue, savedFields);
+
+                    // TODO Kevin: Thread-safe get max PK
+
+                    // TODO Kevin: This seems clunky.
+                    string PKColumn;
+                    if (currType.BaseType == typeof(DataModel))
+                    {
+                        IEnumerable<string> PKColumns = from field in currentProperties where field.Name.ToLower().EndsWith("id") select field.Name;
+
+                        if (PKColumns.Count() != 1 && typeof(DataModel) != instance.GetType().BaseType)
+                            throw new Exception("Database models using inheritance must define exactly 1 explicit primary key column.");
+
+                        try
+                        {
+                            PKColumn = PKColumns.First();
+                        }
+                        catch (InvalidOperationException)
+                        {
+                            // Assume the first property to be the primary key, when no more suitable column could be found.
+                            PKColumn = currentProperties.First().Name;
+                        }
+                    }
+                    else
+                    {
+                        string baseName = currType.BaseType.Name;
+                        PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
+                    }
+
+                    if (instance.isSaved)
+                    {
+                        IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
+                        string sql = $"UPDATE {currType.Name} SET {string.Join(", ", fieldAndValue)} WHERE {PKColumn} = {currType.GetProperty(PKColumn).GetValue(instance, null)};";
+                        new MySqlCommand(sql, conn).ExecuteNonQuery();
+                    }
+                    else
+                    {
+                        string sql = $"INSERT INTO {currType.Name}({string.Join(", ", orderedFieldsNamesToSave)}) VALUES (\"{string.Join("\", \"", orderedFieldValuesToSave)}\");\nSELECT max({PKColumn}) FROM {currType.Name};";
+                        MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
+
+                        // Update the personID of the now saved person.
+                        rdr.Read();
+                        PKValue = rdr[0].ToString();
+                        try
+                        {
+                            currType.GetProperty(PKColumn).SetValue(instance, rdr[0]);
+                        }
+                        catch
+                        {
+                        }
+                        rdr.Close();
+                    }
+
+
+                    foreach (PropertyInfo field in currentProperties)
+                        savedFields.Add(field.Name);
+
+                    return (PKValue, savedFields);
+                }
+
                 try
                 {
                     conn.Open();
 
                     new MySqlCommand("START TRANSACTION;", conn).ExecuteNonQuery();
 
-                    saveCurrentTable(instance.GetType(), conn);
+                    saveCurrentTable(instance.GetType());
                     instance.isSaved = true;
 
                     new MySqlCommand("COMMIT;", conn).ExecuteNonQuery();
@@ -190,13 +194,84 @@ namespace SchemaClasses
             }
         }
 
+        /// <summary>
+        /// Retrieves the DataModels that satisfy the provided conditions.
+        /// </summary>
+        /// <typeparam name="T">Type of DataModel to retrieve instances of</typeparam>
+        /// <param name="conditions"></param>
+        /// <returns></returns>
+        public static List<T> Filter<T>(Dictionary<string, object> conditions = null) where T : DataModel, new()
+        {
+            List<T> returnList = new List<T>();
+            using (MySqlConnection conn = new MySqlConnection(DBManager.ConnectionString))
+            {
+                Type instanceType = typeof(T);
+                T instance = DataController.CreateInstance<T>();
+
+                HashSet<string> retrievedProperties = new HashSet<string>();
+
+                string whereString = "";
+                try
+                {
+                    IEnumerable<string> conditionString = conditions.Keys.Zip(conditions.Values, (a, b) => (a + " = " + b));
+                    whereString = "WHERE" + string.Join(" AND ", conditionString);
+                } 
+                catch {}
+
+                List<string> joinStrings = new List<string>();
+
+                void joinCurrentTable(Type currType)
+                {
+                    if (_invalidBasetypes.Contains(currType.BaseType))
+                        return;
+
+                    // TODO Kevin: Maybe find a more foolproof way to get the current table primary key.
+                    string idSuffix = (currType == instanceType ? "Id" : "");
+                    joinStrings.Add($"INNER JOIN {currType.Name} ON {currType.Name}.{currType.Name}{idSuffix} = {currType.BaseType.Name}.{currType.Name}");
+                    joinCurrentTable(currType.BaseType);
+                }
+
+                joinCurrentTable(instanceType);
+
+                string sql = $"SELECT * FROM {instanceType.Name} {string.Join(" ", joinStrings)} {whereString}";
+                MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
+
+                while (rdr.Read())
+                {
+                    Console.WriteLine(rdr);
+                }
+                rdr.Close();
+            }
+
+            return returnList;
+        }
+
+        /// <summary>
+        /// Gets an instance of the specified type of DataModel, according to the specified conditions.
+        /// </summary>
+        /// <typeparam name="T">The type of DataModel to retrieve an instance of.</typeparam>
+        /// <returns>The instance which satisfies the conditions.</returns>
+        public static T Get<T>() where T : DataModel
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Deletes the specified DataModel.
+        /// </summary>
+        /// <param name="instance">DataModel to delete.</param>
+        public static void Delete(DataModel instance)
+        {
+            throw new NotImplementedException();
+        }
+
         public static T CreateInstance<T>() where T : DataModel
         {
             return Activator.CreateInstance<T>();
         }
     }
 
-    public abstract class PersonController : DBController
+    public abstract class PersonController : DataController
     {
 
         public static T Getperson<T>(int id) where T : Person

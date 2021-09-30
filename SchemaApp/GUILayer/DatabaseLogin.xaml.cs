@@ -42,7 +42,7 @@ namespace GUILayer
             dbmanager.username = connObject.User;
             dbmanager.host = connObject.Host;
             dbmanager.port = Convert.ToInt32(connObject.Port);
-            DBController.DBManager = dbmanager;
+            DataController.DBManager = dbmanager;
             // TODO Kevin: Check that the connection works, before enabling the editor stuff.
             ((MainWindow)((DockPanel)((ContentArea)this.Parent).Parent).Parent).editorButtonStack.IsEnabled = true;
         }

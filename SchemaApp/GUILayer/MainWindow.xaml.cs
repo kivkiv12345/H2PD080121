@@ -80,7 +80,7 @@ namespace GUILayer
             void saveEditForm(object sender, RoutedEventArgs e)
             {
 
-                T instance = DBController.CreateInstance<T>();
+                T instance = DataController.CreateInstance<T>();
                 Type type = instance.GetType();
 
                 foreach (FieldStackPanel field in fieldStackList)
@@ -94,7 +94,7 @@ namespace GUILayer
                     }
                     
                 }
-                DBController.Save(instance);
+                DataController.Save(instance);
 
             }
 
