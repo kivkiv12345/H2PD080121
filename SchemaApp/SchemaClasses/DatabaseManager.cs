@@ -24,12 +24,15 @@ namespace SchemaClasses
         public string username = "root";
         public string host = "localhost";
         public int port = 3306;
+
         public string ConnectionString 
         { 
-            get { 
+            get {
                 return $"server={this.host};user={this.username};database=schema_H2;port={this.port};password={this.password}"; 
             } 
         }
+
+        public const string databaseName = "schema_H2";
 
         public DatabaseManager(string password)
         {

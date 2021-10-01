@@ -139,6 +139,8 @@ namespace SchemaClasses
                         PKColumn = baseName[0].ToString().ToLower() + baseName[1..];  // Converting from pascal case to camel case.
                     }
 
+                    new MySqlCommand($"USE {DatabaseManager.databaseName}", conn).ExecuteNonQuery();
+
                     if (instance.isSaved)
                     {
                         IEnumerable<string> fieldAndValue = orderedFieldsNamesToSave.Zip(orderedFieldValuesToSave, (a, b) => a + " = " + b);
@@ -205,6 +207,7 @@ namespace SchemaClasses
             List<T> returnList = new List<T>();
             using (MySqlConnection conn = new MySqlConnection(DBManager.ConnectionString))
             {
+                conn.Open();
                 Type instanceType = typeof(T);
                 T instance = DataController.CreateInstance<T>();
 
@@ -227,18 +230,19 @@ namespace SchemaClasses
 
                     // TODO Kevin: Maybe find a more foolproof way to get the current table primary key.
                     string idSuffix = (currType == instanceType ? "Id" : "");
-                    joinStrings.Add($"INNER JOIN {currType.Name} ON {currType.Name}.{currType.Name}{idSuffix} = {currType.BaseType.Name}.{currType.Name}");
+                    joinStrings.Add($"INNER JOIN {currType.BaseType.Name} ON {currType.BaseType.Name}.{currType.BaseType.Name}{idSuffix} = {currType.Name}.{currType.BaseType.Name}");
                     joinCurrentTable(currType.BaseType);
                 }
 
                 joinCurrentTable(instanceType);
 
+                new MySqlCommand($"USE {DatabaseManager.databaseName}", conn).ExecuteNonQuery();
                 string sql = $"SELECT * FROM {instanceType.Name} {string.Join(" ", joinStrings)} {whereString}";
                 MySqlDataReader rdr = new MySqlCommand(sql, conn).ExecuteReader();
 
                 while (rdr.Read())
                 {
-                    Console.WriteLine(rdr);
+                    Console.WriteLine(rdr.GetString(1));
                 }
                 rdr.Close();
             }
