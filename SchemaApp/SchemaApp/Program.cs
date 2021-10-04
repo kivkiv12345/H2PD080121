@@ -14,8 +14,9 @@ namespace SchemaApp
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Please enter the MySQL password");
-            PersonController.DBManager = new DatabaseManager(Console.ReadLine());
+            //Console.WriteLine("Please enter the MySQL password");
+            //PersonController.DBManager = new DatabaseManager(Console.ReadLine());
+            PersonController.DBManager = new DatabaseManager("Test1234!");
 
             List<Student> students = PersonController.Filter<Student>();
             Environment.Exit(0);

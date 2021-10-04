@@ -1,4 +1,5 @@
-﻿using SchemaClasses;
+﻿using MySql.Data.MySqlClient;
+using SchemaClasses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,22 @@ namespace GUILayer
             dbmanager.port = Convert.ToInt32(connObject.Port);
             DataController.DBManager = dbmanager;
             // TODO Kevin: Check that the connection works, before enabling the editor stuff.
-            ((MainWindow)((DockPanel)((ContentArea)this.Parent).Parent).Parent).editorButtonStack.IsEnabled = true;
+            MySqlConnection conn = new MySqlConnection(dbmanager.ConnectionString);
+            try
+            {
+                conn.Open();
+                ((MainWindow)((DockPanel)((ContentArea)this.Parent).Parent).Parent).editorButtonStack.IsEnabled = true;
+                MessageBox.Show("Connection successfully established.\nControls have been enabled.\nWelcome!");
+            }
+            catch (MySqlException error)
+            {
+                MessageBox.Show(error.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+            
         }
     }
 }

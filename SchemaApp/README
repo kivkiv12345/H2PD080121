@@ -1,3 +1,12 @@
+For your information, this README mostly covers my thoughts and perspective during the development of the program.
+As such; you may skip it, should you find that boring.
+
+Having thus far gained most of my knowledge about Object Oriented Programming from Python, 
+I can say with certainty that I was quite surprised by how heavily traditional OOP languages 
+dedicate themselves to exclusively operating on objects, as opposed to classes themselves.
+One cannot stray far from the standards and patterns of OOP before (the dreaded) reflection becomes necessary.
+I've therefore felt that OOP has been very limiting when adhered to in its entirety.
+
 While I must admit that experimenting with generics and reflection has been an interesting endeavour,
 it has also been increasingly frustrating, due to what I can only perceive as poor design of the C# language.
 Questions such as: "Why can't interfaces have static members?" and "Why can't static classes inherit from each other?"

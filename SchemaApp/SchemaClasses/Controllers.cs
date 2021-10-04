@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using static SchemaClasses.ThisHasToBeHereCauseCSharpIsStupid;
 
 namespace SchemaClasses
 {
-    public abstract class DataController
+    public abstract class DataController : ICrudOps<DataModel>
     {
         // TODO Kevin: This seems like a terrible place to store an instance of the manager.
         public static DatabaseManager DBManager;
@@ -209,15 +210,12 @@ namespace SchemaClasses
             {
                 conn.Open();
                 Type instanceType = typeof(T);
-                T instance = DataController.CreateInstance<T>();
-
-                HashSet<string> retrievedProperties = new HashSet<string>();
 
                 string whereString = "";
                 try
                 {
-                    IEnumerable<string> conditionString = conditions.Keys.Zip(conditions.Values, (a, b) => (a + " = " + b));
-                    whereString = "WHERE" + string.Join(" AND ", conditionString);
+                    IEnumerable<string> conditionString = conditions.Keys.Zip(conditions.Values, (a, b) => ($"{a} = \"{b}\""));
+                    whereString = "WHERE " + string.Join(" AND ", conditionString);
                 } 
                 catch {}
 
@@ -242,7 +240,64 @@ namespace SchemaClasses
 
                 while (rdr.Read())
                 {
-                    Console.WriteLine(rdr.GetString(1));
+                    T instance = DataController.CreateInstance<T>();
+                    instance.isSaved = true;
+                    for (int i = 0; i < rdr.FieldCount; i++)
+                    {
+
+                        PropertyInfo prop = instanceType.GetProperty(rdr.GetName(i));
+                        var value = rdr.GetValue(i);
+
+                        try
+                        {
+                            if (prop != null)
+                                prop.SetValue(instance, value);  // Attempt to apply the value natively.
+                        }
+                        catch (ArgumentException e)  // Could not assign property from its native form. Attempt to find an alternative.
+                        {
+                            // TODO Kevin: We should probably retrieve the values somewhere else or at some other abstraction level.
+                            if (value is DBNull)
+                            {
+                                prop.SetValue(instance, null);
+                            } 
+                            else if (typeof(DataModel).IsAssignableFrom(prop.PropertyType))  // Checks if the property is a foreignkey (Instance of DataModel).
+                            {
+                                string _sql = 
+                                    $"USE information_schema; " +
+                                    $"SELECT REFERENCED_COLUMN_NAME FROM KEY_COLUMN_USAGE " +
+                                    $"WHERE " +
+                                    $"REFERENCED_TABLE_NAME = '{prop.PropertyType.Name}' " +
+                                    $"AND COLUMN_NAME = '{prop.Name}' " +
+                                    $"AND TABLE_SCHEMA = 'schema_H2'; ";
+
+                                using (MySqlConnection conn2 = new MySqlConnection(DBManager.ConnectionString))
+                                {
+                                    // TODO Kevin: Once we retrieve a foreignkey object, we should probably store it somewhere,
+                                    // such that other references to the same row may refer to the same object.
+                                    conn2.Open();
+                                    MySqlDataReader rdr2 = new MySqlCommand(_sql, conn2).ExecuteReader();
+                                    rdr2.Read();
+                                    var runtimeTypeDataController = RuntimeCRUDDict[prop.PropertyType];
+                                    DataModel foriegnKeyInstance = runtimeTypeDataController.Get(new Dictionary<string, object> { { rdr2.GetString(0), value } });
+                                    prop.SetValue(instance, foriegnKeyInstance);
+                                    rdr2.Close();
+                                }
+                            }
+                            else if (prop.PropertyType == typeof(DateTime))
+                            {
+                                prop.SetValue(instance, DateTime.Parse(rdr.GetString(i)));
+                            }
+                            // Check if the property is an enum, then convert it to its respective type.
+                            // TODO Kevin: This is probably incredibly fragile, and will break in an instant.
+                            else if (prop.PropertyType.IsEnum || ((TypeInfo)prop.PropertyType).DeclaredProperties.Last().PropertyType.IsEnum)
+                            {
+                                prop.SetValue(instance, Enum.Parse(((TypeInfo)prop.PropertyType).DeclaredProperties.Last().PropertyType, rdr.GetString(i)));
+                            }
+                            else  // We can't handle this data type yet, so we rethrow the exception.
+                                throw e;
+                        }
+                    }
+                    returnList.Add(instance);
                 }
                 rdr.Close();
             }
@@ -255,9 +310,15 @@ namespace SchemaClasses
         /// </summary>
         /// <typeparam name="T">The type of DataModel to retrieve an instance of.</typeparam>
         /// <returns>The instance which satisfies the conditions.</returns>
-        public static T Get<T>() where T : DataModel
+        public static T Get<T>(Dictionary<string, object> conditions = null) where T : DataModel, new()
         {
-            throw new NotImplementedException();
+            // TODO Kevin: This is likely slower than writing SQL to return one or two instances directly.
+            List<T> instances = DataController.Filter<T>(conditions);
+
+            if (instances.Count() != 1)
+                throw new Exception("Query returned more or less than 1 instance.");
+
+            return instances.First();
         }
 
         /// <summary>
@@ -266,7 +327,40 @@ namespace SchemaClasses
         /// <param name="instance">DataModel to delete.</param>
         public static void Delete(DataModel instance)
         {
-            throw new NotImplementedException();
+            Type instanceType = instance.GetType();
+            PropertyInfo[] props = instanceType.GetProperties();
+
+            //Dictionary<string, object> pkDict = getPrimaryKeys(instance).ToDictionary(x => x.Item1, y => y.Item2);
+
+            string pkValue = getPrimaryKeys(instance).First().Item2.ToString();
+
+            using (MySqlConnection conn = new MySqlConnection(DBManager.ConnectionString))
+            {
+                conn.Open();
+                void deleteFromTable(Type type)
+                {
+                    if (_invalidBasetypes.Contains(type))
+                        return;
+
+                    MySqlDataReader rdr = new MySqlCommand($"SHOW KEYS FROM {DatabaseManager.databaseName}.{type.Name} WHERE Key_name = 'PRIMARY'", conn).ExecuteReader();
+
+                    rdr.Read();
+                    string primaryKeyName = rdr.GetString(4);
+                    rdr.Close();
+
+                    new MySqlCommand("START TRANSACTION;", conn).ExecuteNonQuery();
+
+                    string sql = $"DELETE FROM {type.Name} WHERE {primaryKeyName} = {pkValue}";
+                    if (new MySqlCommand(sql, conn).ExecuteNonQuery() != 1)  // More or less than 1 row affected.
+                        new MySqlCommand("ROLLBACK;", conn).ExecuteNonQuery();
+                    new MySqlCommand("COMMIT;", conn).ExecuteNonQuery();
+
+                    if (type.BaseType != null)
+                        deleteFromTable(type.BaseType);
+                }
+
+                deleteFromTable(instanceType);
+            }
         }
 
         public static T CreateInstance<T>() where T : DataModel
@@ -363,7 +457,5 @@ namespace SchemaClasses
                         returnSet.Add(relatedPerson);
             return returnSet;
         }
-
-
     }
 }

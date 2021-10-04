@@ -31,7 +31,7 @@ namespace GUILayer
             createEditForm<Subject>();
             createEditForm<CampusTeam>();
 
-            //editorButtonStack.IsEnabled = false;
+            editorButtonStack.IsEnabled = false;
         }
 
         public void createEditForm<T>() where T : DataModel

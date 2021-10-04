@@ -28,7 +28,7 @@ namespace SchemaClasses
     /// Used in situations where C# denies or lacks obvious functionality and or features.
     /// In such situations, this exception may be thrown following sanity checks during runtime.
     /// </summary>
-    public class CSharpIsStupidException : Exception
+    public class CSharpIsStupidException : NotImplementedException
     {
         public CSharpIsStupidException()
         {
