@@ -13,6 +13,12 @@
     <Compile Update="DatabaseLogin.xaml.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Update="DataModelOptions.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="ModelDataGrid.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Page Update="ContentArea.xaml">
@@ -21,7 +27,13 @@
     <Page Update="DatabaseLogin.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Update="DataModelOptions.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <Page Update="MainWindow.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="ModelDataGrid.xaml">
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>

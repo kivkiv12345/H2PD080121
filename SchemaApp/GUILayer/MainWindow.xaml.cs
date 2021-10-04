@@ -26,19 +26,22 @@ namespace GUILayer
         {
             InitializeComponent();
 
-            createEditForm<Student>();
-            createEditForm<Teacher>();
-            createEditForm<Subject>();
-            createEditForm<CampusTeam>();
+            InitDataModelForms<Student>();
+            InitDataModelForms<Teacher>();
+            InitDataModelForms<Subject>();
+            InitDataModelForms<CampusTeam>();
 
-            editorButtonStack.IsEnabled = false;
+            editorButtonStack.IsEnabled = false;  // Will be enabled when a successful connection to the database has been established.
         }
 
-        public void createEditForm<T>() where T : DataModel
+        private void InitDataModelForms<T>() where T : DataModel, new()
         {
             Type tclass = typeof(T);
 
             StackPanel contentArea = new StackPanel();
+
+            DataModelOptions showAndCreateView = new DataModelOptions();
+            ModelDataGrid dataGrid = new ModelDataGrid();
 
             PropertyInfo[] tclassProps = tclass.GetProperties();
 
@@ -95,7 +98,6 @@ namespace GUILayer
                     
                 }
                 DataController.Save(instance);
-
             }
 
             Button saveButton = new Button();
@@ -106,13 +108,32 @@ namespace GUILayer
 
             contentArea.Children.Add(saveButton);
 
-            void changeContentView(object sender, RoutedEventArgs e)
+            void showModelEditForm(object sender, RoutedEventArgs e)
             {
                 this.ContentView.Content = contentArea;
             }
 
+            void showModelInstances(object sender, RoutedEventArgs e)
+            {
+                dataGrid.modelDataGrid.ItemsSource = DataController.Filter<T>();
+                this.ContentView.Content = dataGrid;
+            }
+
+            void showModelOptions(object sender, RoutedEventArgs e)
+            {
+                this.ContentView.Content = showAndCreateView;
+            }
+
+            Button showEditFormButton = showAndCreateView.CreateButton;
+            showEditFormButton.Click += showModelEditForm;
+            showEditFormButton.Content += $" {tclass.Name}";
+
+            Button showRowFormButton = showAndCreateView.ShowButton;
+            showRowFormButton.Click += showModelInstances;
+            showRowFormButton.Content += $" {tclass.Name}";
+
             Button stackButton = new Button();
-            stackButton.Click += changeContentView;
+            stackButton.Click += showModelOptions;
             stackButton.Content = tclass.Name;
 
             this.editorButtonStack.Children.Add(stackButton);

@@ -36,3 +36,7 @@ C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windo
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ref\GUILayer.dll
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.pdb
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.genruntimeconfig.cache
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\DataModelOptions.g.cs
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\DataModelOptions.baml
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ModelDataGrid.g.cs
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ModelDataGrid.baml
