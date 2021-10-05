@@ -10,7 +10,8 @@
         <TextBox x:Name="hostTextBox" HorizontalAlignment="Left" Margin="91,29,0,0" Text="{Binding Host}" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="portTestBox" HorizontalAlignment="Left" Margin="91,58,0,0" Text="{Binding Port}" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="userTextBox" HorizontalAlignment="Left" Margin="91,85,0,0" Text="{Binding User}" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="passwordTextBox" HorizontalAlignment="Left" Margin="91,121,0,0" Text="{Binding Password}" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
+        <PasswordBox x:Name="passwordTextBox" PasswordChar="*" HorizontalAlignment="Left" Margin="91,121,0,0" VerticalAlignment="Top" Width="120"/>
+        <!-- PasswordBoxes can't use databinding; for reasons... Text="{Binding Password}" TextWrapping="Wrap" -->
         <Label x:Name="hostLabel" Content="Username" HorizontalAlignment="Left" Margin="24,79,0,0" VerticalAlignment="Top" Width="67"/>
         <Label x:Name="portLabel" Content="Host" HorizontalAlignment="Left" Margin="24,52,0,0" VerticalAlignment="Top" Width="37"/>
         <Label x:Name="userLabel" Content="Password" HorizontalAlignment="Left" Margin="24,115,0,0" VerticalAlignment="Top" Width="63"/>

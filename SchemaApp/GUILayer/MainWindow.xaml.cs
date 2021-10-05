@@ -38,8 +38,6 @@ namespace GUILayer
         {
             Type tclass = typeof(T);
 
-            StackPanel contentArea = new StackPanel();
-
             DataModelOptions showAndCreateView = new DataModelOptions();
             ModelDataGrid dataGrid = new ModelDataGrid();
 
@@ -53,63 +51,66 @@ namespace GUILayer
                 if (prop.Name.Length > longest)
                     longest = prop.Name.Length;
 
-            List<FieldStackPanel> fieldStackList = new List<FieldStackPanel>();
-
-            foreach (PropertyInfo prop in tclassProps)
-            {
-                FieldStackPanel horizontalPanel = new FieldStackPanel();
-                horizontalPanel.Orientation = Orientation.Horizontal;
-
-                TextBox propLabel = new TextBox();
-                horizontalPanel.FieldNameBox = propLabel;
-                propLabel.IsReadOnly = true;
-                propLabel.Text = prop.Name;
-                propLabel.MinWidth = longest * propLabelWidthMult;
-
-                // TODO Kevin: We might want the possibility to add a dropdown for enums here.
-                TextBox propInput = new TextBox();
-                horizontalPanel.InputFieldBox = propInput;
-                propInput.Width = inputFieldWidth;
-
-                horizontalPanel.Children.Add(propLabel);
-                horizontalPanel.Children.Add(propInput);
-
-                contentArea.Children.Add(horizontalPanel);
-
-                fieldStackList.Add(horizontalPanel);
-
-            }
-
-            void saveEditForm(object sender, RoutedEventArgs e)
-            {
-
-                T instance = DataController.CreateInstance<T>();
-                Type type = instance.GetType();
-
-                foreach (FieldStackPanel field in fieldStackList)
-                {
-                    try
-                    {
-                        type.GetProperty(field.FieldNameBox.Text).SetValue(instance, field.InputFieldBox.Text);
-                    } catch
-                    {
-                        Console.WriteLine("Failed to write value");
-                    }
-                    
-                }
-                DataController.Save(instance);
-            }
-
-            Button saveButton = new Button();
-            saveButton.MinWidth = longest * propLabelWidthMult + inputFieldWidth;
-            saveButton.HorizontalAlignment = HorizontalAlignment.Left;
-            saveButton.Click += saveEditForm;
-            saveButton.Content = "Save";
-
-            contentArea.Children.Add(saveButton);
-
             void showModelEditForm(object sender, RoutedEventArgs e)
             {
+                StackPanel contentArea = new StackPanel();
+
+                List<FieldStackPanel> fieldStackList = new List<FieldStackPanel>();
+
+                foreach (PropertyInfo prop in tclassProps)
+                {
+                    FieldStackPanel horizontalPanel = new FieldStackPanel();
+                    horizontalPanel.Orientation = Orientation.Horizontal;
+
+                    TextBox propLabel = new TextBox();
+                    horizontalPanel.FieldNameBox = propLabel;
+                    propLabel.IsReadOnly = true;
+                    propLabel.Text = prop.Name;
+                    propLabel.MinWidth = longest * propLabelWidthMult;
+
+                    // TODO Kevin: We might want the possibility to add a dropdown for enums here.
+                    TextBox propInput = new TextBox();
+                    horizontalPanel.InputFieldBox = propInput;
+                    propInput.Width = inputFieldWidth;
+
+                    horizontalPanel.Children.Add(propLabel);
+                    horizontalPanel.Children.Add(propInput);
+
+                    contentArea.Children.Add(horizontalPanel);
+
+                    fieldStackList.Add(horizontalPanel);
+
+                }
+
+                void saveEditForm(object sender, RoutedEventArgs e)
+                {
+
+                    T instance = DataController.CreateInstance<T>();
+                    Type type = instance.GetType();
+
+                    foreach (FieldStackPanel field in fieldStackList)
+                    {
+                        try
+                        {
+                            type.GetProperty(field.FieldNameBox.Text).SetValue(instance, field.InputFieldBox.Text);
+                        }
+                        catch
+                        {
+                            Console.WriteLine("Failed to write value");
+                        }
+
+                    }
+                    DataController.Save(instance);
+                }
+
+                Button saveButton = new Button();
+                saveButton.MinWidth = longest * propLabelWidthMult + inputFieldWidth;
+                saveButton.HorizontalAlignment = HorizontalAlignment.Left;
+                saveButton.Click += saveEditForm;
+                saveButton.Content = "Save";
+
+                contentArea.Children.Add(saveButton);
+
                 this.ContentView.Content = contentArea;
             }
 

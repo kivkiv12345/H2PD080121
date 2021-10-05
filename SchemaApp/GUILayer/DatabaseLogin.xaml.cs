@@ -39,6 +39,7 @@ namespace GUILayer
 
         private void connect_Click(object sender, RoutedEventArgs e)
         {
+            connObject.Password = passwordTextBox.Password;  // Assign the password from the PasswordBox, as it doesn't allow for databinding.
             DatabaseManager dbmanager = new DatabaseManager(connObject.Password);
             dbmanager.username = connObject.User;
             dbmanager.host = connObject.Host;
@@ -50,11 +51,12 @@ namespace GUILayer
             {
                 conn.Open();
                 ((MainWindow)((DockPanel)((ContentArea)this.Parent).Parent).Parent).editorButtonStack.IsEnabled = true;
-                MessageBox.Show("Connection successfully established.\nControls have been enabled.\nWelcome!");
+                MessageBox.Show("Connection successfully established.\nControls have been enabled.\nWelcome!", "Connection Successful!");
             }
             catch (MySqlException error)
             {
-                MessageBox.Show(error.Message);
+                ((MainWindow)((DockPanel)((ContentArea)this.Parent).Parent).Parent).editorButtonStack.IsEnabled = false;
+                MessageBox.Show(error.Message, "Connection failed!");
             }
             finally
             {

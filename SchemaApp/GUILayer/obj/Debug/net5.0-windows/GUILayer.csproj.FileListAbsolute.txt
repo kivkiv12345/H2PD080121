@@ -16,14 +16,12 @@ C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windo
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\SchemaClasses.dll
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\bin\Debug\net5.0-windows\SchemaClasses.pdb
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.csprojAssemblyReference.cache
-C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ContentArea.g.cs
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\DatabaseLogin.g.cs
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\MainWindow.g.cs
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\App.g.cs
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer_MarkupCompile.cache
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer_MarkupCompile.lref
-C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ContentArea.baml
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\DatabaseLogin.baml
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\MainWindow.baml
 C:\Users\kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\GUILayer.g.resources
@@ -40,3 +38,5 @@ C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windo
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\DataModelOptions.baml
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ModelDataGrid.g.cs
 C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\ModelDataGrid.baml
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\CreateForm.g.cs
+C:\Users\Kevin\source\repos\H2PD080121\SchemaApp\GUILayer\obj\Debug\net5.0-windows\CreateForm.baml
