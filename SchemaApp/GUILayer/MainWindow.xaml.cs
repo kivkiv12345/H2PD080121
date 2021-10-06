@@ -53,7 +53,7 @@ namespace GUILayer
 
             void showModelEditForm(object sender, RoutedEventArgs e)
             {
-                StackPanel contentArea = new StackPanel();
+                StackPanel editForm = new StackPanel();
 
                 List<FieldStackPanel> fieldStackList = new List<FieldStackPanel>();
 
@@ -76,7 +76,7 @@ namespace GUILayer
                     horizontalPanel.Children.Add(propLabel);
                     horizontalPanel.Children.Add(propInput);
 
-                    contentArea.Children.Add(horizontalPanel);
+                    editForm.Children.Add(horizontalPanel);
 
                     fieldStackList.Add(horizontalPanel);
 
@@ -86,7 +86,7 @@ namespace GUILayer
                 {
 
                     T instance = DataController.CreateInstance<T>();
-                    Type type = instance.GetType();
+                    Type type = typeof(T);
 
                     foreach (FieldStackPanel field in fieldStackList)
                     {
@@ -96,11 +96,11 @@ namespace GUILayer
                         }
                         catch
                         {
-                            Console.WriteLine("Failed to write value");
                         }
 
                     }
                     DataController.Save(instance);
+                    MessageBox.Show($"Successfully saved {instance}");
                 }
 
                 Button saveButton = new Button();
@@ -109,9 +109,9 @@ namespace GUILayer
                 saveButton.Click += saveEditForm;
                 saveButton.Content = "Save";
 
-                contentArea.Children.Add(saveButton);
+                editForm.Children.Add(saveButton);
 
-                this.ContentView.Content = contentArea;
+                this.ContentView.Content = editForm;
             }
 
             void showModelInstances(object sender, RoutedEventArgs e)

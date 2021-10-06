@@ -1,10 +1,14 @@
 ﻿const uri = 'https://cityinfo.buchwaldshave34.dk/api/City';
 const countryUri = 'https://cityinfo.buchwaldshave34.dk/api/Country';
 const languageUri = 'https://cityinfo.buchwaldshave34.dk/api/Language';
+const cityLanguageUri = 'https://cityinfo.buchwaldshave34.dk/api/CityLanguage';
 let resposeItems = [];
 
+const userName = "UserK";
+const userQueryParam = "UserName=" + userName;
+
 function getItems() {
-    fetch(`${uri}?includeRelations=true&UseLazyLoading=true&UseAutoMapper=true`)
+    fetch(`${uri}?includeRelations=true&UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
         .then(response => response.json())
         .then(data => _displayItems(data))
         .catch(error => console.error('Unable to get items.', error));
@@ -13,10 +17,13 @@ function getItems() {
 function addItem() {
     const addNameTextbox = document.getElementById('add-name');
     const addDescriptionTextbox = document.getElementById('add-description');
-    const addCountrySelect = document.getElementById('add-countrySelect');
+    //const addCountrySelect = document.getElementById('add-countrySelect');
     let CountryIdValue = $("#add-countrySelect option:selected").val();
 
-    console.log(CountryIdValue);
+    let languageIds = [];
+    $("#add-languagesSelect option:selected").each(function () {
+        languageIds.push(this.value);
+    });
 
     const city = {
         name: addNameTextbox.value.trim(),
@@ -27,7 +34,7 @@ function addItem() {
     //var url = new URL(uri);
     //url.searchParams.append('UserName', username)
 
-    fetch(`${uri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true`, {
+    fetch(`${uri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -36,11 +43,36 @@ function addItem() {
         body: JSON.stringify(city)
     })
         .then(response => response.json())
+        .then(data => addCityLanguage(data, languageIds))
         .then(() => {
             getItems();
-            addNameTextbox.value = '';
         })
         .catch(error => console.error('Unable to add item.', error));
+}
+
+function addCityLanguage(cityId, languages) {
+
+    console.log(cityId);
+    console.log(languages);
+
+    languages.forEach(language => {
+
+        languageItem = {
+            cityId: cityId,
+            languageId: parseInt(language, 10),
+        }
+
+        fetch(`${cityLanguageUri}?${userQueryParam}`, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(languageItem)
+        })
+            .catch(error => console.error('Unable to add item.', error));
+
+    })
 }
 
 function deleteItem(id) {
@@ -59,7 +91,8 @@ function clearSelect(select) {
 }
 
 function displayEditForm(id) {
-    const item = resposeItems.find(item => item.id === id);
+
+    const item = resposeItems.find(item => item.cityId === id);
 
     let countrySelect = document.getElementById("edit-countrySelect");
     let languageSelect = document.getElementById('edit-languages');
@@ -67,7 +100,7 @@ function displayEditForm(id) {
     clearSelect(countrySelect);
     clearSelect(languageSelect);
 
-    fetch(`${countryUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true`)
+    fetch(`${countryUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
         .then(response => response.json())
         .then(data => data.forEach(function (country) {
             let option = document.createElement("option");
@@ -80,17 +113,16 @@ function displayEditForm(id) {
         }))
         .catch(error => console.error('Unable to get items.', error));
 
-    fetch(`${languageUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true`)
+    fetch(`${languageUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
         .then(response => response.json())
         .then(data => data.forEach(function (language) {
             let option = document.createElement("option");
-            option.value = language.id;
+            option.value = language.languageId;
             option.text = language.languageName;
 
-            // TODO Kevin: This doesn't work!!!!!!!!!!!!!!
             for (i = 0; i < item.cityLanguages.length; i++) {
-                if (item.cityLanguages[i].id === language.id) {
-                    language.selected = true;
+                if (item.cityLanguages[i].languageId === language.languageId) {
+                    option.selected = true;
                     break;
                 }
             }
@@ -100,25 +132,50 @@ function displayEditForm(id) {
         .catch(error => console.error('Unable to get items.', error));
 
     document.getElementById('edit-name').value = item.name;
-    document.getElementById('edit-id').value = item.id;
+    document.getElementById('edit-id').value = item.cityId;
     document.getElementById('edit-description').value = item.description;
     
     document.getElementById('editForm').style.display = 'block';
 }
 
+function deleteCityLanguages(cityId) {
+    fetch(`${languageUri}?UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(language => {
+                console.log(language);
+                console.log(cityId);
+                try {
+                    // TODO Kevin: This delete url is broken for some reason. Causes internal server error 500.
+                    fetch(`${cityLanguageUri}/${cityId},${language.languageId}?CityId=${cityId}&LanguageId=${language.languageId}`, {
+                        method: 'DELETE'
+                    })
+                        .catch(error => console.error('Unable to delete item.', error));
+                } catch {}
+            })
+        })
+        .catch(error => console.error('Unable to get items.', error));
+    
+}
+
 function updateItem() {
     const itemId = document.getElementById('edit-id').value;
 
-    const optionID = $("#add-countrySelect option:selected").val();
+    const optionID = $("#edit-countrySelect option:selected").val();
 
     const item = {
-        id: parseInt(itemId, 10),
+        cityId: parseInt(itemId, 10),
         name: document.getElementById('edit-name').value.trim(),
         description: document.getElementById('edit-description').value.trim(),
-        countryID: optionID,
+        countryID: parseInt(optionID, 10),
     };
 
-    fetch(`${uri}/${itemId}`, {
+    let languageIds = [];
+    $("#edit-languages option:selected").each(function () {
+        languageIds.push(this.value);
+    });
+
+    fetch(`${uri}/${itemId}?${userQueryParam}`, {
         method: 'PUT',
         headers: {
             'Accept': 'application/json',
@@ -126,6 +183,8 @@ function updateItem() {
         },
         body: JSON.stringify(item)
     })
+        .then(() => deleteCityLanguages(itemId))  // TODO Kevin: This do not work.
+        .then(() => addCityLanguage(itemId, languageIds))
         .then(() => getItems())
         .catch(error => console.error('Unable to update item.', error));
 
@@ -150,13 +209,28 @@ function _displayItems(data) {
 
     clearSelect(newCityCountrySelect);
 
-    fetch(`${countryUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true`)
+    fetch(`${countryUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true${userQueryParam}`)
         .then(response => response.json())
         .then(data => data.forEach(function (country) {
             let option = document.createElement("option");
             option.value = country.countryID;
             option.text = country.countryName;
             newCityCountrySelect.appendChild(option);
+        }))
+        .catch(error => console.error('Unable to get items.', error));
+
+    let newCitylanguagesSelect = document.getElementById("add-languagesSelect");
+
+    clearSelect(newCitylanguagesSelect);
+
+    fetch(`${languageUri}?includeRelations=false&UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
+        .then(response => response.json())
+        .then(data => data.forEach(function (language) {
+            let option = document.createElement("option");
+            option.value = language.languageId;
+            option.text = language.languageName;
+
+            newCitylanguagesSelect.appendChild(option);
         }))
         .catch(error => console.error('Unable to get items.', error));
 
@@ -171,11 +245,11 @@ function _displayItems(data) {
 
         let editButton = button.cloneNode(false);
         editButton.innerText = 'Edit';
-        editButton.setAttribute('onclick', `displayEditForm(${item.id})`);
+        editButton.setAttribute('onclick', `displayEditForm(${item.cityId})`);
 
         let deleteButton = button.cloneNode(false);
         deleteButton.innerText = 'Delete';
-        deleteButton.setAttribute('onclick', `deleteItem(${item.id})`);
+        deleteButton.setAttribute('onclick', `deleteItem(${item.cityId})`);
 
         let tr = tBody.insertRow();
 
@@ -193,15 +267,21 @@ function _displayItems(data) {
 
         let td5 = tr.insertCell(3);
         let text = "";
-        item.cityLanguages.forEach(function (lang) { text += lang.languageName + ", " })
+        item.cityLanguages.forEach(function (lang) { text += lang.languageName + ", " });
         let textNode4 = document.createTextNode(text);
         td5.appendChild(textNode4);
 
         let td6 = tr.insertCell(4);
-        td6.appendChild(editButton);
+        let text2 = "";
+        item.pointsOfInterest.forEach(function (poi) { text2 += poi.name + ", " });
+        let textNode5 = document.createTextNode(text2);
+        td6.appendChild(textNode5);
 
         let td7 = tr.insertCell(5);
-        td7.appendChild(deleteButton);
+        td7.appendChild(editButton);
+
+        let td8 = tr.insertCell(6);
+        td8.appendChild(deleteButton);
     });
 
     resposeItems = data;
