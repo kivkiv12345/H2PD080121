@@ -7,7 +7,7 @@ let resposeItems = [];
 const userName = "UserK";
 const userQueryParam = "UserName=" + userName;
 
-function getItems() {
+async function getItems() {
     fetch(`${uri}?includeRelations=true&UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
         .then(response => response.json())
         .then(data => _displayItems(data))
@@ -50,19 +50,18 @@ function addItem() {
         .catch(error => console.error('Unable to add item.', error));
 }
 
-function addCityLanguage(cityId, languages) {
+async function addCityLanguage(cityId, languages) {
 
-    console.log(cityId);
     console.log(languages);
 
-    languages.forEach(language => {
+    languages.forEach(async language => {
 
         languageItem = {
             cityId: cityId,
             languageId: parseInt(language, 10),
         }
 
-        fetch(`${cityLanguageUri}?${userQueryParam}`, {
+        await fetch(`${cityLanguageUri}?${userQueryParam}`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -138,24 +137,22 @@ function displayEditForm(id) {
     document.getElementById('editForm').style.display = 'block';
 }
 
-function deleteCityLanguages(cityId) {
-    fetch(`${languageUri}?UseLazyLoading=true&UseAutoMapper=true&${userQueryParam}`)
+async function deleteCityLanguages(cityId) {
+
+    await fetch(`${cityLanguageUri}?includeRelations=false&${userQueryParam}`)
         .then(response => response.json())
-        .then(data => {
-            data.forEach(language => {
-                console.log(language);
-                console.log(cityId);
-                try {
-                    // TODO Kevin: This delete url is broken for some reason. Causes internal server error 500.
-                    fetch(`${cityLanguageUri}/${cityId},${language.languageId}?CityId=${cityId}&LanguageId=${language.languageId}`, {
-                        method: 'DELETE'
-                    })
-                        .catch(error => console.error('Unable to delete item.', error));
-                } catch {}
-            })
-        })
+        .then(data => data.forEach(function (cityLanguage) {
+
+            if (cityLanguage.cityId == cityId) {
+
+                fetch(`${cityLanguageUri}/${cityId},${cityLanguage.languageId}?CityId=${cityId}&LanguageId=${cityLanguage.languageId}`, {
+                    method: 'DELETE'
+                })
+                    .catch(error => console.error('Unable to delete item.', error));
+            }
+
+        }))
         .catch(error => console.error('Unable to get items.', error));
-    
 }
 
 function updateItem() {
@@ -183,9 +180,9 @@ function updateItem() {
         },
         body: JSON.stringify(item)
     })
-        .then(() => deleteCityLanguages(itemId))  // TODO Kevin: This do not work.
-        .then(() => addCityLanguage(itemId, languageIds))
-        .then(() => getItems())
+        .then(async () => await deleteCityLanguages(itemId))  // TODO Kevin: This do not work.
+        .then(async () => await addCityLanguage(itemId, languageIds))
+        .then(async () => await getItems())
         .catch(error => console.error('Unable to update item.', error));
 
     closeInput();
